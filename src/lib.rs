@@ -30,7 +30,7 @@ macro_rules! assert_true {
 ///
 /// # Examples
 ///
-/// ```
+/// ```rust
 /// # use ntest::assert_false;
 /// #[test]
 /// fn test_assert_false() {
@@ -38,7 +38,7 @@ macro_rules! assert_true {
 /// }
 /// ```
 ///
-/// ```
+/// ```rust
 /// # use ntest::assert_false;
 /// #[test]
 /// #[should_panic]
@@ -50,5 +50,38 @@ macro_rules! assert_true {
 macro_rules! assert_false {
     ($x:expr) => ({
         assert!(!($x));
+    });
+}
+
+/// A panic in Rust is not always implemented via unwinding, but can be implemented by aborting the
+/// process as well. This function only catches unwinding panics, not those that abort the process.
+/// See the catch unwind [documentation](https://doc.rust-lang.org/std/panic/fn.catch_unwind.html)
+/// for more information.
+///
+/// # Examples
+///
+/// ```rust
+/// #[test]
+/// fn assert_panic() {
+///    //Here panic can happen!
+///    assert_panics!({panic!("I am panicing")});
+/// }
+/// ```
+///
+/// ```
+///#[test]
+/// #[should_panic]
+///fn test_assert_panics_fail() {
+///    // This call should fail
+///    assert_panics!({println!("I am not panicing")});
+///}
+/// ```
+#[macro_export]
+macro_rules! assert_panics {
+    ($x:block) => ({
+        println!("Inside the macro!");
+        //let expr = &($x);
+        let result = std::panic::catch_unwind(||$x);
+        assert!(result.is_err());
     });
 }
