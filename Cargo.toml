@@ -1,9 +1,12 @@
 [package]
 name = "ntest"
 version = "0.1.0"
-authors = ["Armin Becher <armin.becher@methodpark.de>"]
+authors = ["Armin Becher <becherarmin@gmail.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+path = "src/lib.rs"
 
 [dependencies]
