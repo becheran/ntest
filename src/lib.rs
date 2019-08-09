@@ -63,7 +63,8 @@ macro_rules! assert_false {
 /// ```rust
 /// #[test]
 /// fn assert_panic() {
-///    //Here panic can happen!
+///    // Here panic can happen!
+///    // ...
 ///    assert_panics!({panic!("I am panicing")});
 /// }
 /// ```
@@ -79,8 +80,6 @@ macro_rules! assert_false {
 #[macro_export]
 macro_rules! assert_panics {
     ($x:block) => ({
-        println!("Inside the macro!");
-        //let expr = &($x);
         let result = std::panic::catch_unwind(||$x);
         assert!(result.is_err());
     });
