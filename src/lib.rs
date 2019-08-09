@@ -69,12 +69,20 @@ macro_rules! assert_false {
 /// }
 /// ```
 ///
-/// ```
+/// ```rust
 ///#[test]
 /// #[should_panic]
-///fn test_assert_panics_fail() {
+///fn assert_panics_fail() {
 ///    // This call should fail
 ///    assert_panics!({println!("I am not panicing")});
+///}
+///```
+///
+///```rust
+///#[test]
+///fn assert_panics_with_text() {
+///    // This call should fail
+///    assert_panics!({panic!("I am panicing")}, "I am panicing");
 ///}
 /// ```
 #[macro_export]
@@ -83,4 +91,34 @@ macro_rules! assert_panics {
         let result = std::panic::catch_unwind(||$x);
         assert!(result.is_err());
     });
+    ($x:block, $e:expr) => ({
+        use std::panic;
+
+        fn test (){
+            println!("TSt");
+            assert!(false);
+        }
+
+        panic::set_hook(Box::new(|panic_info| {
+            if let Some(s) = panic_info.payload().downcast_ref::<&str>() {
+                println!("panic occurred: {:?}", s);
+                test();
+            } else {
+                println!("Second parameter of assert_panics call must be of type &str.");
+            }
+        }));
+
+        let result = std::panic::catch_unwind(||$x);
+        //assert!(result.is_err());
+        let _ = panic::take_hook();
+    });
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn assert_panics_with_text() {
+        // This call should fail
+        assert_panics!({panic!("I am panicing")}, "I am panicing");
+    }
 }
