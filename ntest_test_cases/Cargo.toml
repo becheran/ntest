@@ -1,10 +1,18 @@
 [package]
-name = "test_cases"
-version = "1.0.0"
+name = "ntest_test_cases"
+version = "0.1.0"
 authors = ["Armin Becher <armin.becher@gmail.com>"]
 edition = "2018"
+description = "Test cases for ntest framwork."
+keywords = ["test", "tests", "unit", "testing", "test-cases"]
+categories = ["development-tools", "development-tools::testing"]
+readme = "README.md"
+license-file = "LICENSE"
+repository = "https://gitlab.com/becheran/ntest"
+documentation = "https://docs.rs/ntest"
 
 [lib]
+name = "ntest_test_cases"
 proc-macro = true
 
 [dependencies]

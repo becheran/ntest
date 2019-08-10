@@ -91,3 +91,10 @@ extern crate test_cases;
 #[doc(hidden)]
 pub use serde_derive::*;
 */
+
+#[allow(unused_imports)]
+#[macro_use]
+extern crate ntest_test_cases;
+#[cfg(feature = "serde_derive")]
+#[doc(hidden)]
+pub use ntest_test_cases::*;
