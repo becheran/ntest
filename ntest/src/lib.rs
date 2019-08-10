@@ -82,3 +82,12 @@ macro_rules! assert_panics {
         assert!(result.is_err());
     });
 }
+/*
+#[cfg(feature = "test_cases")]
+#[allow(unused_imports)]
+#[macro_use]
+extern crate test_cases;
+#[cfg(feature = "test_cases")]
+#[doc(hidden)]
+pub use serde_derive::*;
+*/
