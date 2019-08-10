@@ -23,7 +23,7 @@ path = "src/lib.rs"
 
 
 [dependencies]
-ntest_test_cases = { version = "0.1.0", path = "../ntest_test_cases" }
+ntest_test_cases = { version = "0.1.1", path = "../ntest_test_cases" }
 
 [dev-dependencies]
-ntest_test_cases = { version = "0.1.0", path = "../ntest_test_cases" }
+ntest_test_cases = { version = "0.1.1", path = "../ntest_test_cases" }
