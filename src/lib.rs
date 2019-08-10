@@ -58,7 +58,7 @@ macro_rules! assert_false {
 /// for more information.
 ///
 /// # Examples
-/// 
+///
 /// This call won't panic.
 /// ```rust
 /// # use ntest::assert_panics;
