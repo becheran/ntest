@@ -22,4 +22,7 @@ panic = "unwind"
 [lib]
 path = "src/lib.rs"
 
-[dependencies]
+[workspace]
+members = [
+    "lib/test-cases",
+]
