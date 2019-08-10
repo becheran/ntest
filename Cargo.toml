@@ -11,5 +11,10 @@ panic = "unwind"
 
 [lib]
 path = "src/lib.rs"
+proc-macro = true
 
 [dependencies]
+proc-macro-rules = "0.2.1"
+quote = "0.6"
+proc-macro2 = "0.4"
+syn = "0.15"

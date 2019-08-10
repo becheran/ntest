@@ -1,3 +1,10 @@
+extern crate proc_macro;
+
+use proc_macro::TokenStream;
+use proc_macro_rules::rules;
+extern crate syn;
+use quote::quote;
+
 /// Expects a true expresion. Otherwise panics.
 ///
 /// Is an alias for the [assert! macro](https://doc.rust-lang.org/std/macro.assert.html).
@@ -5,27 +12,25 @@
 /// # Examples
 ///
 /// ```rust
-/// # use ntest::assert_true;
-/// #[test]
-/// fn test_assert_true() {
-///    assert_true!(true);
-/// }
+/// use ntest::assert_true;
+/// assert_true!(true);
 ///```
 ///
 /// ```rust
-/// #[test]
-/// #[should_panic]
-/// fn test_assert_false_fail() {
-///     assert_false!(true);
+/// use ntest::assert_true;
+/// fn main() {
+///     assert_true!(false);
 /// }
 /// ```
-#[macro_export]
-macro_rules! assert_true {
-    ($x:expr) => ({
-        assert!($x);
-    });
+#[proc_macro]
+pub fn assert_true(input: TokenStream) -> TokenStream {
+    rules!(input.into() => {
+        ($x:expr) => { quote! {
+            assert!(#x);
+        }}
+    }).into()
 }
-
+/*
 /// Expects a false expresion. Otherwise panics.
 ///
 /// # Examples
@@ -40,9 +45,7 @@ macro_rules! assert_true {
 ///
 /// ```rust
 /// # use ntest::assert_false;
-/// #[test]
-/// #[should_panic]
-/// fn test_assert_false_fails() {
+/// fn main() {
 ///     assert_false!(true);
 /// }
 /// ```
@@ -84,3 +87,4 @@ macro_rules! assert_panics {
         assert!(result.is_err());
     });
 }
+*/
