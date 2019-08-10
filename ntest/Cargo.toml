@@ -1,6 +1,6 @@
 [package]
 name = "ntest"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Armin Becher <becherarmin@gmail.com>"]
 edition = "2018"
 description = "Testing framework for rust which enhances the built-in library with some useful features."
@@ -23,7 +23,7 @@ path = "src/lib.rs"
 
 
 [dependencies]
-ntest_test_cases = { version = "0.1.1", path = "../ntest_test_cases" }
+ntest_test_cases = { version = "0.1.2", path = "../ntest_test_cases" }
 
 [dev-dependencies]
-ntest_test_cases = { version = "0.1.1", path = "../ntest_test_cases" }
+ntest_test_cases = { version = "0.1.2", path = "../ntest_test_cases" }
