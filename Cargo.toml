@@ -8,6 +8,7 @@ keywords = ["test", "tests", "unit", "testing"]
 categories = ["development-tools", "development-tools::testing"]
 readme = "README.md"
 license = "MIT"
+license-file = "LICENSE"
 repository = "https://gitlab.com/becheran/ntest"
 documentation = "https://docs.rs/ntest"
 
