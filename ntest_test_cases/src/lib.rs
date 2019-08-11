@@ -9,8 +9,6 @@ use syn::export::TokenStream2;
 
 #[proc_macro_attribute]
 pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
-    println!("attr: \"{}\"", attr.to_string());
-    println!("item: \"{}\"", item.to_string());
     let mut test_case_descriptions: Vec<TestCaseDescription> = vec![];
     let attr = parse_macro_input!(attr as syn::AttributeArgs);
     let input = parse_macro_input!(item as syn::ItemFn);
@@ -50,7 +48,6 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
             syn::FnArg::Captured(c) => {
                 match &c.pat {
                     syn::Pat::Ident(ident) => {
-                        println!("Function argument identifier {:?}", ident.ident);
                         fn_args_idents.push(ident.ident.clone());
                     }
                     _ => panic!("Unexpected function identifier.")
@@ -71,11 +68,14 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
             panic!("Test case arguments and function input signature do not match");
         }
 
+        // Needs to be immutable
+        let fn_args_idents = fn_args_idents.clone();
+
         let test_case_quote = quote! {
             #[test]
             fn #test_case_name() {
                 let x = 42;
-                #(let x = #literals;)*
+                #(let #fn_args_idents = #literals;)*
                 #fn_body
             }
         };
