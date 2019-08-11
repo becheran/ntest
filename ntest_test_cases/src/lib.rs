@@ -41,8 +41,24 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
         }
     }
 
-    let function_arguments = &input.decl.inputs;
-    
+    let fn_args = &input.decl.inputs;
+    let fn_body = &input.block;
+    let mut fn_args_idents: Vec<syn::Ident> = vec![];
+
+    for i in fn_args {
+        match i {
+            syn::FnArg::Captured(c) => {
+                match &c.pat {
+                    syn::Pat::Ident(ident) => {
+                        println!("Function argument identifier {:?}", ident.ident);
+                        fn_args_idents.push(ident.ident.clone());
+                    }
+                    _ => panic!("Unexpected function identifier.")
+                }
+            }
+            _ => panic!("Unexpected function identifier.")
+        }
+    }
 
     let mut result = TokenStream2::new();
     for test_case_description in test_case_descriptions {
@@ -50,11 +66,17 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
             &format!("{}{}", &input.ident.to_string(), &test_case_description.name),
             Span::call_site(),
         );
+        let literals = test_case_description.literals;
+        if &literals.len() != &fn_args_idents.len() {
+            panic!("Test case arguments and function input signature do not match");
+        }
 
         let test_case_quote = quote! {
             #[test]
             fn #test_case_name() {
-                assert!(true);
+                let x = 42;
+                #(let x = #literals;)*
+                #fn_body
             }
         };
         result.extend(test_case_quote);

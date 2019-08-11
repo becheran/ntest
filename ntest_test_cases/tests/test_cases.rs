@@ -13,7 +13,7 @@ fn one_arg(x: u32) {
 
 #[test_case(13)]
 fn one_arg_fail(x: u32) {
-    assert_eq!(x, 42)
+    assert_eq!(x, 13)
 }
 
 //#[test_case(m=21,13, 42)]
