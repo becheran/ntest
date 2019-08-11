@@ -16,3 +16,5 @@ name = "ntest_test_cases"
 proc-macro = true
 
 [dependencies]
+syn = {version = "0.15.44",features = ["full"]}
+quote = "0.6"
