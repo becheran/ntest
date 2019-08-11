@@ -1,11 +1,10 @@
 extern crate proc_macro;
 extern crate syn;
 
-use proc_macro2::{Ident, Span};
-use syn::{parse_macro_input, DeriveInput};
+use proc_macro2::Span;
+use syn::parse_macro_input;
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::token::Token;
 use syn::export::TokenStream2;
 
 #[proc_macro_attribute]
@@ -27,15 +26,14 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
                         if ml.ident != "test_case" {
                             panic!("Only test_case attributes expected, but found {:?}", ml.ident);
                         }
-                        let argument_args : syn::AttributeArgs = ml.nested.into_iter().collect();
+                        let argument_args: syn::AttributeArgs = ml.nested.into_iter().collect();
                         test_case_descriptions.push(parse_test_case_attributes(&argument_args));
                     }
                     syn::Meta::Word(i) => {
                         panic!("Wrong input {:?} for test cases", i)
                     }
-                    syn::Meta::NameValue(l) => {
-                        // TODO check for named values
-                        unimplemented!()
+                    syn::Meta::NameValue(_) => {
+                        unimplemented!("Need to check for named values");
                     }
                 }
             }
@@ -43,22 +41,24 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
         }
     }
 
-    let test_double: Vec<String> = vec!["hello".to_string(), "world".to_string()];
-
-    let test_case_name = syn::Ident::new(
-        &format!("{}{}", &input.ident.to_string(), &test_case_descriptions[0].name),
-        Span::call_site());
-
-
     let function_arguments = &input.decl.inputs;
+    
 
-    let mut result = quote! {
-        #[test]
-        fn #test_case_name() {
-            #(println!(#test_double);)*
-            assert!(true);
-        }
-    };
+    let mut result = TokenStream2::new();
+    for test_case_description in test_case_descriptions {
+        let test_case_name = syn::Ident::new(
+            &format!("{}{}", &input.ident.to_string(), &test_case_description.name),
+            Span::call_site(),
+        );
+
+        let test_case_quote = quote! {
+            #[test]
+            fn #test_case_name() {
+                assert!(true);
+            }
+        };
+        result.extend(test_case_quote);
+    }
     result.into()
 }
 
@@ -75,14 +75,15 @@ fn parse_test_case_attributes(attr: &syn::AttributeArgs) -> TestCaseDescription 
 
     for a in attr {
         match a {
-            syn::NestedMeta::Meta(m) => println!("meta"),
+            syn::NestedMeta::Meta(_) => {
+                unimplemented!("Need to check for named values");
+            }
             syn::NestedMeta::Literal(lit) => {
                 literals.push((*lit).clone());
                 name.push_str(&format!("_{}", lit_to_str(lit)));
             }
         }
     }
-    println!("{}", name);
 
     TestCaseDescription {
         literals,
