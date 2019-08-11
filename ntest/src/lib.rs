@@ -82,3 +82,7 @@ macro_rules! assert_panics {
         assert!(result.is_err());
     });
 }
+
+// Reexport procedural macros
+extern crate ntest_test_cases;
+pub use ntest_test_cases::*;
