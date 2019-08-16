@@ -22,7 +22,9 @@
 #[macro_export]
 macro_rules! assert_true {
     ($x:expr) => ({
-        assert!($x);
+        if !$x {
+            panic!("assertion failed: Expected 'true', but was 'false'");
+        }
     });
     ($x:expr,) => ({
         assert_true!($x);
@@ -51,7 +53,9 @@ macro_rules! assert_true {
 #[macro_export]
 macro_rules! assert_false {
     ($x:expr) => ({
-        assert!(!($x));
+        if $x {
+            panic!("assertion failed: Expected 'false', but was 'true'");
+        }
     });
     ($x:expr,) => ({
         assert_false!($x);
@@ -85,7 +89,9 @@ macro_rules! assert_false {
 macro_rules! assert_panics {
     ($x:block) => ({
         let result = std::panic::catch_unwind(||$x);
-        assert!(result.is_err());
+        if !result.is_err(){
+            panic!("assertion failed: code in block did not panic");
+        }
     });
     ($x:block,) => ({
         assert_panics!($x);
@@ -101,13 +107,46 @@ mod tests {
     use super::*;
     
     #[test]
+    fn assert_true() {
+        assert_true!(true);
+    }
+    
+    #[test]
+    #[should_panic]
+    fn assert_true_fails() {
+        assert_true!(false);
+    }
+    
+    #[test]
     fn assert_true_trailing_comma() {
         assert_true!(true,);
     }
     
     #[test]
+    fn assert_false() {
+        assert_false!(false);
+    }
+    
+    #[test]
+    #[should_panic]
+    fn assert_false_fails() {
+        assert_false!(true);
+    }
+    
+    #[test]
     fn assert_false_trailing_comma() {
         assert_false!(false,);
+    }
+    
+    #[test]
+    fn assert_panics() {
+        assert_panics!({panic!("I am panicing!")},);
+    }
+    
+    #[test]
+    #[should_panic]
+    fn assert_panics_fails() {
+        assert_panics!({println!("I am not panicing!")},);
     }
     
     #[test]
