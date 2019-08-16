@@ -24,6 +24,9 @@ macro_rules! assert_true {
     ($x:expr) => ({
         assert!($x);
     });
+    ($x:expr,) => ({
+        assert_true!($x);
+    });
 }
 
 /// Expects a false expresion. Otherwise panics.
@@ -49,6 +52,9 @@ macro_rules! assert_true {
 macro_rules! assert_false {
     ($x:expr) => ({
         assert!(!($x));
+    });
+    ($x:expr,) => ({
+        assert_false!($x);
     });
 }
 
@@ -81,8 +87,31 @@ macro_rules! assert_panics {
         let result = std::panic::catch_unwind(||$x);
         assert!(result.is_err());
     });
+    ($x:block,) => ({
+        assert_panics!($x);
+    });
 }
 
 // Reexport procedural macros
 extern crate ntest_test_cases;
 pub use ntest_test_cases::*;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn assert_true_trailing_comma() {
+        assert_true!(true,);
+    }
+    
+    #[test]
+    fn assert_false_trailing_comma() {
+        assert_false!(false,);
+    }
+    
+    #[test]
+    fn assert_panics_trailing_comma() {
+        assert_panics!({panic!("I am panicing!")},);
+    }
+}
