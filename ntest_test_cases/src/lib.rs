@@ -7,6 +7,29 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::export::TokenStream2;
 
+
+///Test cases can be used to have multiple inputs for a given function. With the *test_case* attribute multiple tests will be generated using the [Procedural Macros](https://blog.rust-lang.org/2018/12/21/Procedural-Macros-in-Rust-2018.html) capabilities of rust.
+///
+///# Examples
+///
+///Example with a single argument
+///```
+///#[test_case(13)]
+///#[test_case(42)]
+///fn one_arg(x: u32) {
+///    assert!(x == 13 || x == 42)
+///}
+///```
+///
+///Example with multiple arguments:
+///```
+///#[test_case(13, 13)]
+///#[test_case(42, 42)]
+///fn two_args(x: u32, y: u32) {
+///    assert_eq!(x, y);
+///}
+
+///```
 #[proc_macro_attribute]
 pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
     let mut test_case_descriptions: Vec<TestCaseDescription> = vec![];
