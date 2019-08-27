@@ -1,5 +1,6 @@
 stages:
   - build
+  - publish
 
 rust-latest:
   stage: build
@@ -15,3 +16,16 @@ rust-nightly:
     - cargo build --verbose
     - cargo test --verbose
   allow_failure: true
+
+publish:
+  stage: publish
+  image: rust:latest
+  script:
+    - cargo login $CRATES_IO_KEY
+    - cd /src/ntest_test_cases
+    - cargo publish --verbose
+    - cd /src/ntest
+    - cargo publish --verbose
+  only:
+    - master
+    - tags
