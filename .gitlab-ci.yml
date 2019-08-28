@@ -25,5 +25,6 @@ publish:
     - cargo publish --verbose --manifest-path ntest_test_cases/Cargo.toml
     - cargo publish --verbose --manifest-path ntest/Cargo.toml
   only:
-    - master
     - tags
+  except:
+    - branches
