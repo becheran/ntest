@@ -70,12 +70,12 @@ def main():
     git_push_with_tag(version)
 
 def deploy_crate():    
-    subprocess.run(["cargo", "publish", "--verbose" ,"--manifest-path", "ntest_test_cases/Cargo.toml"])
+    subprocess.run(["cargo", "publish", "--verbose" ,"--manifest-path", "ntest_test_cases/Cargo.toml", "--allow-dirty"])
     # TODO wait till new package version was published
     timout = 5
     print('Wait {} seconds before the main lib will be published'.format(timout))
     time.sleep(timout)
-    subprocess.run(["cargo", "publish", "--verbose" ,"--manifest-path", "ntest/Cargo.toml"])
+    subprocess.run(["cargo", "publish", "--verbose" ,"--manifest-path", "ntest/Cargo.toml", "--allow-dirty"])
 
 def git_push_with_tag(version: str):
     subprocess.run(["git", "add", "ntest/Cargo.toml"])
