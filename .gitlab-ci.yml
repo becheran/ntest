@@ -22,10 +22,8 @@ publish:
   image: rust:latest
   script:
     - cargo login $CRATES_IO_KEY
-    - cd ~/ntest_test_cases
-    - cargo publish --verbose
-    - cd ~/ntest
-    - cargo publish --verbose
+    - cargo publish --verbose --manifest-path ntest_test_cases/Cargo.toml
+    - cargo publish --verbose --manifest-path ntest/Cargo.toml
   only:
     - master
     - tags
