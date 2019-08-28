@@ -4,6 +4,7 @@ import os
 from enum import Enum
 import argparse
 import subprocess
+import time
 
 FILE_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -50,7 +51,7 @@ def version_type(string: str):
 
 
 def cli_parse_args():
-    parser = argparse.ArgumentParser(description='Update rust version')
+    parser = argparse.ArgumentParser(description='Publish new rust version')
     parser.add_argument('type', type=version_type)
     opts = parser.parse_args()
     return opts.type
@@ -64,11 +65,19 @@ def main():
     version.update(update_type)
     print('Updated to version {}'.format(version))
     update_version_in_files(str(version))
+    deploy_crate()
     print('Add tag and push via git.')
-    git_push_tag(version)
+    git_push_with_tag(version)
 
+def deploy_crate():    
+    subprocess.run(["cargo", "publish", "--verbose" ,"--manifest-path", "ntest_test_cases/Cargo.toml"])
+    # TODO wait till new package version was published
+    timout = 5
+    print('Wait {} seconds before the main lib will be published'.format(timout))
+    time.sleep(timout)
+    subprocess.run(["cargo", "publish", "--verbose" ,"--manifest-path", "ntest/Cargo.toml"])
 
-def git_push_tag(version: str):
+def git_push_with_tag(version: str):
     subprocess.run(["git", "add", "ntest/Cargo.toml"])
     subprocess.run(["git", "add", "ntest_test_cases/Cargo.toml"])
     subprocess.run(["git", "tag",
