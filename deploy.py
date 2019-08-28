@@ -75,7 +75,7 @@ def git_push_tag(version: str):
                     "-a", "v{}".format(version),
                     "-m Version {}".format(version)])
     subprocess.run(["git", "commit"])
-    subprocess.run(["git", "push"])
+    subprocess.run(["git", "push", "origin", "v{}".format(version)])
 
 
 def read_current_version():

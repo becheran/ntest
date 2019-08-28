@@ -9,7 +9,7 @@ categories = [ "development-tools", "development-tools::testing",]
 readme = "README.md"
 license-file = "LICENSE"
 repository = "https://gitlab.com/becheran/ntest"
-documentation = "https://docs.rs/ntest"
+documentation = "https://docs.ntest.rs/ntest/"
 
 [lib]
 path = "src/lib.rs"
