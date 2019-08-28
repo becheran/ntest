@@ -15,7 +15,7 @@ documentation = "https://docs.rs/ntest"
 path = "src/lib.rs"
 
 [badges.gitlab]
-repository = "https://gitlab.com/becheran/ntest"
+repository = "becheran/ntest"
 branch = "master"
 
 [badges.maintenance]
