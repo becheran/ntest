@@ -1,6 +1,6 @@
 [package]
 name = "ntest_test_cases"
-version = "0.1.5"
+version = "0.1.6"
 authors = [ "Armin Becher <armin.becher@gmail.com>",]
 edition = "2018"
 description = "Test cases for ntest framwork."
@@ -9,7 +9,7 @@ categories = [ "development-tools", "development-tools::testing",]
 readme = "README.md"
 license-file = "LICENSE"
 repository = "https://gitlab.com/becheran/ntest"
-documentation = "https://docs.ntest.rs/ntest_test_cases/"
+documentation = "https://docs.rs/ntest"
 
 [lib]
 name = "ntest_test_cases"

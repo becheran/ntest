@@ -1,6 +1,6 @@
 [package]
 name = "ntest"
-version = "0.1.5"
+version = "0.1.6"
 authors = [ "Armin Becher <becherarmin@gmail.com>",]
 edition = "2018"
 description = "Testing framework for rust which enhances the built-in library with some useful features."
@@ -9,7 +9,7 @@ categories = [ "development-tools", "development-tools::testing",]
 readme = "README.md"
 license-file = "LICENSE"
 repository = "https://gitlab.com/becheran/ntest"
-documentation = "https://docs.ntest.rs/ntest/"
+documentation = "https://docs.rs/ntest"
 
 [lib]
 path = "src/lib.rs"
@@ -25,9 +25,9 @@ status = "actively-developed"
 panic = "unwind"
 
 [dependencies.ntest_test_cases]
-version = "0.1.5"
+version = "0.1.6"
 path = "../ntest_test_cases"
 
 [dev-dependencies.ntest_test_cases]
-version = "0.1.5"
+version = "0.1.6"
 path = "../ntest_test_cases"
