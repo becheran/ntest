@@ -1,3 +1,10 @@
+//! The ntest lib enhances the rust test framework with usefull functions and macros
+
+// Reexport procedural macros
+extern crate ntest_test_cases;
+#[doc(inline)]
+pub use ntest_test_cases::test_case;
+
 /// Expects a true expresion. Otherwise panics.
 ///
 /// Is an alias for the [assert! macro](https://doc.rust-lang.org/std/macro.assert.html).
@@ -97,10 +104,6 @@ macro_rules! assert_panics {
         assert_panics!($x);
     });
 }
-
-// Reexport procedural macros
-extern crate ntest_test_cases;
-pub use ntest_test_cases::*;
 
 #[cfg(test)]
 mod tests {

@@ -1,3 +1,5 @@
+//! Part of the ntest library. Add test cases to the rust test framework.
+
 extern crate proc_macro;
 extern crate syn;
 
