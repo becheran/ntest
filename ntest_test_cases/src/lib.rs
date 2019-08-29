@@ -38,25 +38,25 @@ use syn::export::TokenStream2;
 #[proc_macro_attribute]
 pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
     let mut test_case_descriptions: Vec<TestCaseDescription> = vec![];
-    let attr = parse_macro_input!(attr as syn::AttributeArgs);
+    let attributes_first_test_case = parse_macro_input!(attr as syn::AttributeArgs);
     let input = parse_macro_input!(item as syn::ItemFn);
 
     // Collect test case descriptions
-    test_case_descriptions.push(parse_test_case_attributes(&attr));
-    for at in &input.attrs {
-        let meta = at.parse_meta();
+    test_case_descriptions.push(parse_test_case_attributes(&attributes_first_test_case));
+    for attribute in &input.attrs {
+        let meta = attribute.parse_meta();
         match meta {
             Ok(m) => {
                 match m {
-                    syn::Meta::List(ml) => {
-                        if ml.ident != "test_case" {
-                            panic!("Only test_case attributes expected, but found {:?}", ml.ident);
+                    syn::Meta::Path(p) => {
+                        let identifier = p.get_ident().expect("Expected identifier");
+                        if identifier != "test_case" {
+                            panic!("Only test_case attributes expected, but found {:?}", identifier);
                         }
+                    }
+                    syn::Meta::List(ml) => {
                         let argument_args: syn::AttributeArgs = ml.nested.into_iter().collect();
                         test_case_descriptions.push(parse_test_case_attributes(&argument_args));
-                    }
-                    syn::Meta::Word(i) => {
-                        panic!("Wrong input {:?} for test cases", i)
                     }
                     syn::Meta::NameValue(_) => {
                         unimplemented!("Need to check for named values");
@@ -67,28 +67,29 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
         }
     }
 
-    let fn_args = &input.decl.inputs;
+    let fn_args = &input.sig.inputs;
     let fn_body = &input.block;
     let mut fn_args_idents: Vec<syn::Ident> = vec![];
 
     for i in fn_args {
         match i {
-            syn::FnArg::Captured(c) => {
-                match &c.pat {
-                    syn::Pat::Ident(ident) => {
-                        fn_args_idents.push(ident.ident.clone());
+            syn::FnArg::Typed(t) => {
+                let ubox_t = *(t.pat.clone());
+                match ubox_t {
+                    syn::Pat::Ident(i) => {
+                        fn_args_idents.push(i.ident.clone());
                     }
                     _ => panic!("Unexpected function identifier.")
                 }
             }
-            _ => panic!("Unexpected function identifier.")
+            syn::FnArg::Receiver(_) => panic!("Receiver function not expected for test case attribute.")
         }
     }
 
     let mut result = TokenStream2::new();
     for test_case_description in test_case_descriptions {
         let test_case_name = syn::Ident::new(
-            &format!("{}{}", &input.ident.to_string(), &test_case_description.name),
+            &format!("{}{}", &input.sig.ident, &test_case_description.name),
             Span::call_site(),
         );
         let literals = test_case_description.literals;
@@ -102,7 +103,6 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
         let test_case_quote = quote! {
             #[test]
             fn #test_case_name() {
-                let x = 42;
                 #(let #fn_args_idents = #literals;)*
                 #fn_body
             }
@@ -128,7 +128,7 @@ fn parse_test_case_attributes(attr: &syn::AttributeArgs) -> TestCaseDescription 
             syn::NestedMeta::Meta(_) => {
                 unimplemented!("Need to check for named values");
             }
-            syn::NestedMeta::Literal(lit) => {
+            syn::NestedMeta::Lit(lit) => {
                 literals.push((*lit).clone());
                 name.push_str(&format!("_{}", lit_to_str(lit)));
             }
@@ -145,7 +145,7 @@ fn lit_to_str(lit: &syn::Lit) -> String {
     match lit {
         syn::Lit::Bool(s) => s.value.to_string(),
         syn::Lit::Str(s) => s.value().to_string(),
-        syn::Lit::Int(s) => s.value().to_string(),
+        syn::Lit::Int(s) => s.base10_digits().to_string(),
         _ => unimplemented!(),
     }
 }
