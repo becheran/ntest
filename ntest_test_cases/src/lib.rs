@@ -103,7 +103,6 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
         let test_case_quote = quote! {
             #[test]
             fn #test_case_name() {
-                let x = 42;
                 #(let #fn_args_idents = #literals;)*
                 #fn_body
             }
@@ -131,7 +130,7 @@ fn parse_test_case_attributes(attr: &syn::AttributeArgs) -> TestCaseDescription 
             }
             syn::NestedMeta::Lit(lit) => {
                 literals.push((*lit).clone());
-                name.push_str(&format!("_{:?}", lit_to_str(lit)));
+                name.push_str(&format!("_{}", lit_to_str(lit)));
             }
         }
     }
@@ -146,7 +145,7 @@ fn lit_to_str(lit: &syn::Lit) -> String {
     match lit {
         syn::Lit::Bool(s) => s.value.to_string(),
         syn::Lit::Str(s) => s.value().to_string(),
-        syn::Lit::Int(s) => s.base10_parse().expect("Expected valid int"),
+        syn::Lit::Int(s) => s.base10_digits().to_string(),
         _ => unimplemented!(),
     }
 }
