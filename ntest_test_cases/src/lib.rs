@@ -146,6 +146,7 @@ fn lit_to_str(lit: &syn::Lit) -> String {
         syn::Lit::Bool(s) => s.value.to_string(),
         syn::Lit::Str(s) => s.value().to_string(),
         syn::Lit::Int(s) => s.base10_digits().to_string(),
+        syn::Lit::Float(s) => s.base10_digits().to_string().replace(".", "d"),
         _ => unimplemented!("String conversion for literal."),
     }
 }

@@ -14,6 +14,11 @@ fn two_args(x: u8, y: u32) {
     assert!(y > 10);
 }
 
+#[test_case(42.42)]
+fn float(x: f32) {
+    assert_eq!(x, 42.42)
+}
+
 #[test_case("walter", "white")]
 fn test_string(x: &str, y: &str) {
     assert_eq!(x, "walter");
