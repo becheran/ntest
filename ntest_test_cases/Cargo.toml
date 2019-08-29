@@ -1,6 +1,6 @@
 [package]
 name = "ntest_test_cases"
-version = "0.1.7"
+version = "0.1.8"
 authors = [ "Armin Becher <armin.becher@gmail.com>",]
 edition = "2018"
 description = "Test cases for ntest framwork."
