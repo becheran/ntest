@@ -83,7 +83,7 @@ def git_push_with_tag(version: str):
     subprocess.run(["git", "tag",
                     "-a", "v{}".format(version),
                     "-m Version {}".format(version)])
-    subprocess.run(["git", "commit"])
+    subprocess.run(["git", "commit", '-m "Release {}"'.format(version)])
     subprocess.run(["git", "push", "origin", "v{}".format(version)])
 
 
