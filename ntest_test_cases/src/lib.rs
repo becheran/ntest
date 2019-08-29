@@ -53,13 +53,10 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
                         if identifier != "test_case" {
                             panic!("Only test_case attributes expected, but found {:?}", identifier);
                         }
-                        //let attribute_args = syn::parse2(tokens as syn::AttributeArgs).expect("Could not parse arguments");
-                        //let attribute_args : syn::AttributeArgs = attribute.parse_args_with(NestedMeta::Parse).unwrap();
-                        let attribute_args = (attribute as syn::AttributeArgs).parse_args();
-                        test_case_descriptions.push(parse_test_case_attributes(&attribute_args));
                     }
-                    syn::Meta::List(_) => {
-                        unimplemented!("Need to check for other types");
+                    syn::Meta::List(ml) => {
+                        let argument_args: syn::AttributeArgs = ml.nested.into_iter().collect();
+                        test_case_descriptions.push(parse_test_case_attributes(&argument_args));
                     }
                     syn::Meta::NameValue(_) => {
                         unimplemented!("Need to check for named values");
@@ -77,14 +74,15 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
     for i in fn_args {
         match i {
             syn::FnArg::Typed(t) => {
-                match *t.pat {
+                let ubox_t = *(t.pat.clone());
+                match ubox_t {
                     syn::Pat::Ident(i) => {
                         fn_args_idents.push(i.ident.clone());
                     }
                     _ => panic!("Unexpected function identifier.")
                 }
             }
-            syn::FnArg::Receiver(t) => panic!("Receiver function not expected for test case attribute.")
+            syn::FnArg::Receiver(_) => panic!("Receiver function not expected for test case attribute.")
         }
     }
 
