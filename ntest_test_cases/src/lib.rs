@@ -49,9 +49,9 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
             Ok(m) => {
                 match m {
                     syn::Meta::Path(p) => {
-                        let identifier = p.get_ident().expect("Expected identifier");
+                        let identifier = p.get_ident().expect("Expected identifier!");
                         if identifier != "test_case" {
-                            panic!("Only test_case attributes expected, but found {:?}", identifier);
+                            panic!("Only test_case attributes expected, but found {:?}.", identifier);
                         }
                     }
                     syn::Meta::List(ml) => {
@@ -59,11 +59,11 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
                         test_case_descriptions.push(parse_test_case_attributes(&argument_args));
                     }
                     syn::Meta::NameValue(_) => {
-                        unimplemented!("Need to check for named values");
+                        unimplemented!("Named values currently not supported.");
                     }
                 }
             }
-            Err(e) => panic!("Could not determine meta data. Error {}", e)
+            Err(e) => panic!("Could not determine meta data. Error {}.", e)
         }
     }
 
@@ -94,7 +94,7 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
         );
         let literals = test_case_description.literals;
         if &literals.len() != &fn_args_idents.len() {
-            panic!("Test case arguments and function input signature do not match");
+            panic!("Test case arguments and function input signature mismatch.");
         }
 
         // Needs to be immutable
@@ -126,7 +126,7 @@ fn parse_test_case_attributes(attr: &syn::AttributeArgs) -> TestCaseDescription 
     for a in attr {
         match a {
             syn::NestedMeta::Meta(_) => {
-                unimplemented!("Need to check for named values");
+                panic!("Unknown test case input type.");
             }
             syn::NestedMeta::Lit(lit) => {
                 literals.push((*lit).clone());
@@ -146,6 +146,6 @@ fn lit_to_str(lit: &syn::Lit) -> String {
         syn::Lit::Bool(s) => s.value.to_string(),
         syn::Lit::Str(s) => s.value().to_string(),
         syn::Lit::Int(s) => s.base10_digits().to_string(),
-        _ => unimplemented!(),
+        _ => unimplemented!("String conversion for literal."),
     }
 }
