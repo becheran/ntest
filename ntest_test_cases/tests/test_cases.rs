@@ -25,6 +25,12 @@ fn test_string(x: &str, y: &str) {
     assert_eq!(y, "white");
 }
 
+
+#[test_case("-390)(#$*Q)")]
+fn test_string_special_chars(x: &str) {
+    assert_eq!(x, "-390)(#$*Q)");
+}
+
 #[test_case(true)]
 fn test_bool(x: bool) {
     assert!(x);
