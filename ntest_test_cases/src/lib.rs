@@ -8,6 +8,7 @@ use proc_macro2::Span;
 use quote::quote;
 use syn::export::TokenStream2;
 use syn::parse_macro_input;
+mod syn_helper;
 
 /// Test cases can be used to have multiple inputs for a given function.
 /// With the *test_case* attribute multiple tests will be generated using the
@@ -15,6 +16,9 @@ use syn::parse_macro_input;
 /// capabilities of rust.
 ///
 /// The function input can be of type `int`, `bool`, or `str`.
+///
+/// Please note that test functions can only contain alphanumeric characters and '_' signs.
+/// Special characters will be escaped using the '_' sign.
 ///
 /// WARNING!
 /// It is currently not possible to have negative numbers as macro input. For example
@@ -42,12 +46,71 @@ use syn::parse_macro_input;
 ///```
 #[proc_macro_attribute]
 pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let mut test_case_descriptions: Vec<TestCaseDescription> = vec![];
     let input = parse_macro_input!(item as syn::ItemFn);
+    let attribute_args = parse_macro_input!(attr as syn::AttributeArgs);
 
-    // Collect test case descriptions
-    let attributes_first_test_case = parse_macro_input!(attr as syn::AttributeArgs);
-    test_case_descriptions.push(parse_test_case_attributes(&attributes_first_test_case));
+    let test_descriptions: Vec<TestDescription> =
+        collect_test_descriptions(&input, &attribute_args);
+    let fn_body = &input.block;
+    let fn_args_idents = collect_function_arg_idents(&input);
+
+    let mut result = TokenStream2::new();
+    for test_description in test_descriptions {
+        let test_case_name = syn::Ident::new(
+            &format!("{}{}", &input.sig.ident, &test_description.name),
+            Span::call_site(),
+        );
+        let literals = test_description.literals;
+        if &literals.len() != &fn_args_idents.len() {
+            panic!("Test case arguments and function input signature mismatch.");
+        }
+
+        let test_case_quote = quote! {
+            #[test]
+            fn #test_case_name() {
+                #(let #fn_args_idents = #literals;)*
+                #fn_body
+            }
+        };
+        result.extend(test_case_quote);
+    }
+    result.into()
+}
+
+struct TestDescription {
+    literals: Vec<syn::Lit>,
+    name: String,
+    // TODO add Meta attributes expected_result
+}
+
+fn collect_function_arg_idents(input: &syn::ItemFn) -> Vec<syn::Ident> {
+    let mut fn_args_idents: Vec<syn::Ident> = vec![];
+    let fn_args = &input.sig.inputs;
+    for i in fn_args {
+        match i {
+            syn::FnArg::Typed(t) => {
+                let ubox_t = *(t.pat.clone());
+                match ubox_t {
+                    syn::Pat::Ident(i) => {
+                        fn_args_idents.push(i.ident.clone());
+                    }
+                    _ => panic!("Unexpected function identifier."),
+                }
+            }
+            syn::FnArg::Receiver(_) => {
+                panic!("Receiver function not expected for test case attribute.")
+            }
+        }
+    }
+    fn_args_idents
+}
+
+fn collect_test_descriptions(
+    input: &syn::ItemFn,
+    attribute_args: &syn::AttributeArgs,
+) -> Vec<TestDescription> {
+    let mut test_case_descriptions: Vec<TestDescription> = vec![];
+    test_case_descriptions.push(parse_test_case_attributes(&attribute_args));
     for attribute in &input.attrs {
         let meta = attribute.parse_meta();
         match meta {
@@ -72,61 +135,10 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
             Err(e) => panic!("Could not determine meta data. Error {}.", e),
         }
     }
-
-    let fn_args = &input.sig.inputs;
-    let fn_body = &input.block;
-    let mut fn_args_idents: Vec<syn::Ident> = vec![];
-
-    for i in fn_args {
-        match i {
-            syn::FnArg::Typed(t) => {
-                let ubox_t = *(t.pat.clone());
-                match ubox_t {
-                    syn::Pat::Ident(i) => {
-                        fn_args_idents.push(i.ident.clone());
-                    }
-                    _ => panic!("Unexpected function identifier."),
-                }
-            }
-            syn::FnArg::Receiver(_) => {
-                panic!("Receiver function not expected for test case attribute.")
-            }
-        }
-    }
-
-    let mut result = TokenStream2::new();
-    for test_case_description in test_case_descriptions {
-        let test_case_name = syn::Ident::new(
-            &format!("{}{}", &input.sig.ident, &test_case_description.name),
-            Span::call_site(),
-        );
-        let literals = test_case_description.literals;
-        if &literals.len() != &fn_args_idents.len() {
-            panic!("Test case arguments and function input signature mismatch.");
-        }
-
-        // Needs to be immutable
-        let fn_args_idents = fn_args_idents.clone();
-
-        let test_case_quote = quote! {
-            #[test]
-            fn #test_case_name() {
-                #(let #fn_args_idents = #literals;)*
-                #fn_body
-            }
-        };
-        result.extend(test_case_quote);
-    }
-    result.into()
+    test_case_descriptions
 }
 
-struct TestCaseDescription {
-    literals: Vec<syn::Lit>,
-    name: String,
-    // TODO add Meta attributes expected_result
-}
-
-fn parse_test_case_attributes(attr: &syn::AttributeArgs) -> TestCaseDescription {
+fn parse_test_case_attributes(attr: &syn::AttributeArgs) -> TestDescription {
     let mut literals: Vec<syn::Lit> = vec![];
     let mut name = "".to_string();
 
@@ -137,41 +149,10 @@ fn parse_test_case_attributes(attr: &syn::AttributeArgs) -> TestCaseDescription 
             }
             syn::NestedMeta::Lit(lit) => {
                 literals.push((*lit).clone());
-                name.push_str(&format!("_{}", lit_to_str(lit)));
+                name.push_str(&format!("_{}", syn_helper::lit_to_str(lit)));
             }
         }
     }
 
-    TestCaseDescription { literals, name }
-}
-
-fn lit_to_str(lit: &syn::Lit) -> String {
-    match lit {
-        syn::Lit::Bool(s) => s.value.to_string(),
-        syn::Lit::Str(s) => string_to_identifier(&s.value()),
-        syn::Lit::Int(s) => number_to_identifier(s.base10_digits()),
-        syn::Lit::Float(s) => number_to_identifier(s.base10_digits()),
-        _ => unimplemented!("String conversion for literal. Only bool, str, positive int, and float values are supported."),
-    }
-}
-
-fn number_to_identifier(num: &str) -> String {
-    num.chars()
-        .map(|x| match x {
-            '.' => 'd',
-            '0'...'9' => x,
-            _ => panic!("This is not a valid number. Contains unknown sign {}", x),
-        })
-        .collect()
-}
-
-fn string_to_identifier(num: &str) -> String {
-    num.chars()
-        .map(|x| match x {
-            '0'...'9' => x,
-            'a'...'z' => x,
-            'A'...'Z' => x,
-            _ => '_',
-        })
-        .collect()
+    TestDescription { literals, name }
 }
