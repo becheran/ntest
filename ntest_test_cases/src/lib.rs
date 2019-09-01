@@ -43,6 +43,14 @@ mod syn_helper;
 ///     assert_eq!(y, "true");
 ///     assert_eq!(z, 1);
 /// }
+/// ```
+///
+/// Example with test_name attribute:
+/// ```ignore
+/// #[test_case(42, test_name="my_fancy_test")]
+/// fn with_name(x: u32) {
+///     assert_eq!(x, 42)
+/// }
 ///```
 #[proc_macro_attribute]
 pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -56,10 +64,7 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
 
     let mut result = TokenStream2::new();
     for test_description in test_descriptions {
-        let test_case_name = syn::Ident::new(
-            &format!("{}{}", &input.sig.ident, &test_description.name),
-            Span::call_site(),
-        );
+        let test_case_name = syn::Ident::new(&test_description.name, Span::call_site());
         let literals = test_description.literals;
         if &literals.len() != &fn_args_idents.len() {
             panic!("Test case arguments and function input signature mismatch.");
@@ -110,7 +115,8 @@ fn collect_test_descriptions(
     attribute_args: &syn::AttributeArgs,
 ) -> Vec<TestDescription> {
     let mut test_case_descriptions: Vec<TestDescription> = vec![];
-    test_case_descriptions.push(parse_test_case_attributes(&attribute_args));
+    let fn_name = input.sig.ident.to_string();
+    test_case_descriptions.push(parse_test_case_attributes(&attribute_args, &fn_name));
     for attribute in &input.attrs {
         let meta = attribute.parse_meta();
         match meta {
@@ -126,7 +132,8 @@ fn collect_test_descriptions(
                 }
                 syn::Meta::List(ml) => {
                     let argument_args: syn::AttributeArgs = ml.nested.into_iter().collect();
-                    test_case_descriptions.push(parse_test_case_attributes(&argument_args));
+                    test_case_descriptions
+                        .push(parse_test_case_attributes(&argument_args, &fn_name));
                 }
                 syn::Meta::NameValue(_) => {
                     unimplemented!("Named values currently not supported.");
@@ -138,19 +145,46 @@ fn collect_test_descriptions(
     test_case_descriptions
 }
 
-fn parse_test_case_attributes(attr: &syn::AttributeArgs) -> TestDescription {
+fn parse_test_case_attributes(attr: &syn::AttributeArgs, fn_name: &str) -> TestDescription {
     let mut literals: Vec<syn::Lit> = vec![];
     let mut name = "".to_string();
 
     for a in attr {
         match a {
-            syn::NestedMeta::Meta(_) => {
-                panic!("Unknown test case input type.");
-            }
+            syn::NestedMeta::Meta(m) => match m {
+                syn::Meta::Path(_) => {
+                    panic!("Path not expected.");
+                }
+                syn::Meta::List(_) => {
+                    panic!("Metalist not expected.");
+                }
+                syn::Meta::NameValue(nv) => {
+                    let identifier = nv.path.get_ident().expect("Expected identifier!");
+                    if identifier == "test_name" {
+                        if !name.is_empty() {
+                            panic!("Test name can only be defined once.");
+                        }
+                        match &nv.lit {
+                            syn::Lit::Str(_) => {
+                                name = syn_helper::lit_to_str(&nv.lit);
+                            }
+                            _ => unimplemented!("Unexpected type for test_name. Expected string."),
+                        }
+                    } else {
+                        panic!("Unexpected identifier '{}'", identifier)
+                    }
+                }
+            },
             syn::NestedMeta::Lit(lit) => {
                 literals.push((*lit).clone());
-                name.push_str(&format!("_{}", syn_helper::lit_to_str(lit)));
             }
+        }
+    }
+
+    if name.is_empty() {
+        name.push_str(fn_name);
+        for lit in &literals {
+            name.push_str(&format!("_{}", syn_helper::lit_to_str(&lit)));
         }
     }
 
