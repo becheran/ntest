@@ -53,3 +53,11 @@ fn with_name(x: u32) {
 fn with_name(x: u32) {
     assert_eq!(x, 42)
 }
+
+#[test_case(18)]
+#[ignore]
+#[test_case(15)]
+#[should_panic(expected = "I am panicing")]
+fn attributes_test_case(x: u32) {
+    panic!("I am panicing");
+}
