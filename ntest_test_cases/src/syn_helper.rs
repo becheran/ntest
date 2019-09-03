@@ -12,7 +12,7 @@ fn number_to_identifier(num: &str) -> String {
     num.chars()
         .map(|x| match x {
             '.' => 'd',
-            '0'...'9' => x,
+            '0'..='9' => x,
             _ => panic!("This is not a valid number. Contains unknown sign {}", x),
         })
         .collect()
@@ -21,9 +21,9 @@ fn number_to_identifier(num: &str) -> String {
 fn string_to_identifier(num: &str) -> String {
     num.chars()
         .map(|x| match x {
-            '0'...'9' => x,
-            'a'...'z' => x,
-            'A'...'Z' => x,
+            '0'..='9' => x,
+            'a'..='z' => x,
+            'A'..='Z' => x,
             _ => '_',
         })
         .collect()
