@@ -1,4 +1,4 @@
-//! The ntest lib enhances the rust test framework with useful functions and macros
+//! The ntest lib enhances the rust test framework with some useful functions.
 
 // Reexport procedural macros
 extern crate ntest_test_cases;
@@ -18,11 +18,11 @@ pub use ntest_test_cases::test_case;
 /// # }
 /// ```
 ///
-/// Compare two vectors with floating point values. Returns the maximum difference in the vectors:
+/// Compare two vectors. Returns the maximum difference in the vectors. In this case *~0.1*.:
 /// ```
 /// # use ntest::MaxDifference;
 /// # fn main() {
-/// assert!(0.1f64 - vec![42.0, 42.0f32].max_diff(vec![42.0, 42.1f32]) < 1.0e-4f64);
+/// assert!(0.1f64 - vec![42.0, 42.0f32, 1.001f32].max_diff(vec![42.0, 42.1f32, 1.0f32]) < 1.0e-4f64);
 /// # }
 /// ```
 pub trait MaxDifference {
@@ -72,7 +72,7 @@ impl MaxDifference for Vec<f64> {
 ///
 /// # Examples
 ///
-/// Compare two floating point values which are about equal.
+/// Compare two floating point values which are about equal:
 /// ```
 /// # use ntest::assert_about_eq;
 /// # fn main() {
@@ -80,15 +80,15 @@ impl MaxDifference for Vec<f64> {
 /// # }
 /// ```
 ///
-/// Explicitly set an epsilon value. This test should fail.
-/// ```should_fail
+/// Explicitly set an epsilon value. This test should fail:
+/// ``` should_panic
 /// # use ntest::assert_about_eq;
 /// # fn main() {
-/// assert_about_eq!(42.00000001f32, 42.0f32, 1.0e-12f32);
+/// assert_about_eq!(42.001f32, 42.0f32, 1.0e-4);
 /// # }
 /// ```
 ///
-/// Compare two vectors of floats which are about equal.
+/// Compare two vectors of floats which are about equal:
 /// ```
 /// # use ntest::assert_about_eq;
 /// # fn main() {
