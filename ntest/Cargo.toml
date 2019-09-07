@@ -1,6 +1,6 @@
 [package]
 name = "ntest"
-version = "0.1.13"
+version = "0.2.0"
 authors = [ "Armin Becher <becherarmin@gmail.com>",]
 edition = "2018"
 description = "Testing framework for rust which enhances the built-in library with some useful features."
@@ -25,9 +25,9 @@ status = "actively-developed"
 panic = "unwind"
 
 [dependencies.ntest_test_cases]
-version = "0.1.13"
+version = "0.2.0"
 path = "../ntest_test_cases"
 
 [dev-dependencies.ntest_test_cases]
-version = "0.1.13"
+version = "0.2.0"
 path = "../ntest_test_cases"
