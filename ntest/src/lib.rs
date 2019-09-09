@@ -5,67 +5,10 @@ extern crate ntest_test_cases;
 #[doc(inline)]
 pub use ntest_test_cases::test_case;
 
-/// Helper trait for `assert_about_equal` macro. Returns the max difference between
-/// two vectors of floats. Can also be used for single floats.  
-///
-/// # Examples
-///
-/// Compare two floating numbers:
-/// ```
-/// # use ntest::MaxDifference;
-/// # fn main() {
-/// assert!((0.1f64 - 42.1f32.max_diff(42.0f32)) < 1.0e-4f64);
-/// # }
-/// ```
-///
-/// Compare two vectors. Returns the maximum difference in the vectors. In this case *~0.1*.:
-/// ```
-/// # use ntest::MaxDifference;
-/// # fn main() {
-/// assert!(0.1f64 - vec![42.0, 42.0f32, 1.001f32].max_diff(vec![42.0, 42.1f32, 1.0f32]) < 1.0e-4f64);
-/// # }
-/// ```
-pub trait MaxDifference {
-    fn max_diff(self, other: Self) -> f64;
-}
-
-impl MaxDifference for f32 {
-    fn max_diff(self, other: Self) -> f64 {
-        return f64::from((self - other).abs());
-    }
-}
-
-impl MaxDifference for f64 {
-    fn max_diff(self, other: Self) -> f64 {
-        return (self - other).abs();
-    }
-}
-
-impl MaxDifference for Vec<f32> {
-    fn max_diff(self, other: Self) -> f64 {
-        let mut max: f64 = 0.0;
-        for (a, b) in self.iter().zip(other.iter()) {
-            let diff = f64::from((*a - *b).abs());
-            if diff > max {
-                max = diff;
-            }
-        }
-        max
-    }
-}
-
-impl MaxDifference for Vec<f64> {
-    fn max_diff(self, other: Self) -> f64 {
-        let mut max: f64 = 0.0;
-        for (a, b) in self.iter().zip(other.iter()) {
-            let diff = (*a - *b).abs();
-            if diff > max {
-                max = diff;
-            }
-        }
-        max
-    }
-}
+// Reexport traits
+mod traits;
+#[doc(inline)]
+pub use crate::traits::MaxDifference;
 
 /// Compare floating point values or vectors of floating points wether they are approximately equal.
 /// The default value for epsilon is `1.0e-6`.
@@ -88,11 +31,19 @@ impl MaxDifference for Vec<f64> {
 /// # }
 /// ```
 ///
-/// Compare two vectors of floats which are about equal:
+/// Compare two vectors or arrays of floats which are about equal:
 /// ```
 /// # use ntest::assert_about_eq;
 /// # fn main() {
 /// assert_about_eq!(vec![1.100000001, 2.1], vec![1.1, 2.1], 0.001f64);
+/// # }
+/// ```
+///
+/// Arrays can be compared to a length of up to `32`. See the [MaxDifference](trait.MaxDifference.html) implementation for more details:
+/// ```
+/// # use ntest::assert_about_eq;
+/// # fn main() {
+/// assert_about_eq!([1.100000001, 2.1], [1.1, 2.1], 0.001f64);
 /// # }
 /// ```
 #[macro_export]
