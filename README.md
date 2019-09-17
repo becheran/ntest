@@ -37,6 +37,7 @@ fn test_http_link_types(link: &str) {
 
 ## Content
 
+- `#[timeout()]` Attribute used for timeouts in tests.
 - `#[test_case()]` Attribute used to define multiple test cases for a test function.
 - `assert_about_equal!()` Compare two floating point values or vectors for equality.
 - `assert_false!()` Expects false argument for test case.
