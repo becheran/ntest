@@ -31,3 +31,11 @@ path = "../ntest_test_cases"
 [dev-dependencies.ntest_test_cases]
 version = "0.2.1"
 path = "../ntest_test_cases"
+
+[dependencies.ntest_timeout]
+version = "0.2.1"
+path = "../ntest_timeout"
+
+[dev-dependencies.ntest_timeout]
+version = "0.2.1"
+path = "../ntest_timeout"

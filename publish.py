@@ -15,7 +15,7 @@ class Version:
         splited = version.split('.')
         if len(splited) != 3:
             raise Exception(
-                'Unkown version string {} Must be of format <major>.<minor>.<patch>.'.format(version))
+                'Unknown version string {} Must be of format <major>.<minor>.<patch>.'.format(version))
         self._major = int(splited[0])
         self._minor = int(splited[1])
         self._patch = int(splited[2])
@@ -38,7 +38,7 @@ class Version:
         elif version_type == 'patch':
             self._patch += 1
         else:
-            raise Exception("Unkown version type {}.".format(version_type))
+            raise Exception("Unknown version type {}.".format(version_type))
 
 
 def version_type(string: str):
@@ -69,8 +69,9 @@ def main():
     print('Add tag and push via git.')
     git_push_with_tag(version)
 
-def deploy_crate():    
+def deploy_crate():
     subprocess.run(["cargo", "publish", "--verbose" ,"--manifest-path", "ntest_test_cases/Cargo.toml", "--allow-dirty"])
+    subprocess.run(["cargo", "publish", "--verbose" ,"--manifest-path", "ntest_timeout/Cargo.toml", "--allow-dirty"])
     # TODO wait till new package version was published
     timout = 5
     print('Wait {} seconds before the main lib will be published'.format(timout))
@@ -80,6 +81,7 @@ def deploy_crate():
 def git_push_with_tag(version: str):
     subprocess.run(["git", "add", "ntest/Cargo.toml"])
     subprocess.run(["git", "add", "ntest_test_cases/Cargo.toml"])
+    subprocess.run(["git", "add", "ntest_timeout/Cargo.toml"])
     subprocess.run(["git", "tag",
                     "-a", "v{}".format(version),
                     "-m Version {}".format(version)])
@@ -102,14 +104,25 @@ def update_version_in_files(version: str):
         toml_content['package']['version'] = version
         toml_content['dependencies']['ntest_test_cases']['version'] = version
         toml_content['dev-dependencies']['ntest_test_cases']['version'] = version
+        toml_content['dependencies']['ntest_timeout']['version'] = version
+        toml_content['dev-dependencies']['ntest_timeout']['version'] = version
     with open(ntest_toml_path, 'w') as toml_file:
         toml_file.write(toml.dumps(toml_content))
+    
     ntest_test_cases_toml_path = os.path.join(
         FILE_DIR, 'ntest_test_cases', 'Cargo.toml')
     with open(ntest_test_cases_toml_path, 'r') as toml_file:
         toml_content = toml.loads(toml_file.read())
         toml_content['package']['version'] = version
     with open(ntest_test_cases_toml_path, 'w') as toml_file:
+        toml_file.write(toml.dumps(toml_content))
+    
+    ntest_timeout_toml_path = os.path.join(
+        FILE_DIR, 'ntest_test_cases', 'Cargo.toml')
+    with open(ntest_timeout_toml_path, 'r') as toml_file:
+        toml_content = toml.loads(toml_file.read())
+        toml_content['package']['version'] = version
+    with open(ntest_timeout_toml_path, 'w') as toml_file:
         toml_file.write(toml.dumps(toml_content))
 
 

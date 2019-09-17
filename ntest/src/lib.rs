@@ -5,6 +5,10 @@ extern crate ntest_test_cases;
 #[doc(inline)]
 pub use ntest_test_cases::test_case;
 
+extern crate ntest_timeout;
+#[doc(inline)]
+pub use ntest_timeout::timeout;
+
 // Reexport traits
 mod traits;
 #[doc(inline)]
