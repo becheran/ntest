@@ -8,8 +8,35 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::parse_macro_input;
 
-/// TODO
+/// The timeout attribute can be used for tests to timeout after a given time.
+/// With the `#[timeout]` attribute a timeout in milliseconds is added to a test.
+///
+/// The function input must be of type `int`. For example `#[timeout(10)]` will timeout after 10 milliseconds.
+///
+/// # Examples
+///
+/// This example will not panic
+/// ```ignore
+/// #[test]
+/// #[timeout(100)]
+/// fn no_timeout() {
+///     let fifty_millis = time::Duration::from_millis(50);
+///     thread::sleep(fifty_millis);
+/// }
 /// ```
+///
+/// This example will panic. The function panics after 10 milliseconds
+///
+/// ```ignore
+/// #[test]
+/// #[timeout(10)]
+/// #[should_panic]
+/// fn timeout() {
+///     let fifty_millis = time::Duration::from_millis(50);
+///     thread::sleep(fifty_millis);
+/// }
+/// ```
+
 #[proc_macro_attribute]
 pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::ItemFn);
@@ -17,7 +44,7 @@ pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
     let name = &input.sig.ident;
     let body = &input.block;
     let timeout_ms = get_timeout(&attribute_args);
-    
+    assert_other_timeouts(&input);
     let result = quote! {
         fn #name() {
             timebomb::timeout_ms(|| {
@@ -28,17 +55,48 @@ pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
     result.into()
 }
 
+fn assert_other_timeouts(input: &syn::ItemFn) {
+    for attribute in &input.attrs {
+        let meta = attribute.parse_meta();
+        match meta {
+            Ok(m) => match m {
+                syn::Meta::Path(p) => {
+                    let identifier = p.get_ident().expect("Expected identifier!");
+                    if identifier == "timeout" {
+                        panic!("Timeout attribute is only allowed once");
+                    }
+                }
+                syn::Meta::List(ml) => {
+                    let identifier = ml.path.get_ident().expect("Expected identifier!");
+                    if identifier == "timeout" {
+                        panic!("Timeout attribute is only allowed once");
+                    }
+                }
+                syn::Meta::NameValue(nv) => {
+                    let identifier = nv.path.get_ident().expect("Expected identifier!");
+                    if identifier == "timeout" {
+                        panic!("Timeout attribute is only allowed once");
+                    }
+                }
+            },
+            Err(e) => panic!("Could not determine meta data. Error {}.", e),
+        }
+    }
+}
+
 fn get_timeout(attribute_args: &syn::AttributeArgs) -> u32 {
     if attribute_args.len() > 1 {
         panic!("Only one integer expected. Example: #[timeout(10)]");
     }
     match &attribute_args[0] {
-        syn::NestedMeta::Meta(_) => {panic!("Integer expected. Example: #[timeout(10)]");},
-        syn::NestedMeta::Lit(lit) => {
-            match lit {
-                syn::Lit::Int(int) => {return int.base10_parse::<u32>().expect("Integer expected")}
-                _ => { panic!("Integer as timeout in ms expected. Example: #[timeout(10)]");}
-            }
+        syn::NestedMeta::Meta(_) => {
+            panic!("Integer expected. Example: #[timeout(10)]");
         }
+        syn::NestedMeta::Lit(lit) => match lit {
+            syn::Lit::Int(int) => return int.base10_parse::<u32>().expect("Integer expected"),
+            _ => {
+                panic!("Integer as timeout in ms expected. Example: #[timeout(10)]");
+            }
+        },
     }
 }

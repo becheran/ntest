@@ -118,7 +118,7 @@ def update_version_in_files(version: str):
         toml_file.write(toml.dumps(toml_content))
     
     ntest_timeout_toml_path = os.path.join(
-        FILE_DIR, 'ntest_test_cases', 'Cargo.toml')
+        FILE_DIR, 'ntest_timeout', 'Cargo.toml')
     with open(ntest_timeout_toml_path, 'r') as toml_file:
         toml_content = toml.loads(toml_file.read())
         toml_content['package']['version'] = version

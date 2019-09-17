@@ -1,34 +1,31 @@
-# NTest  TestCases
+# NTest  Timeout
 
-Part of the [NTest library](https://crates.io/crates/ntest). Add test cases to the rust test framework using 
+Part of the [NTest library](https://crates.io/crates/ntest). Add the timeout attribute to the rust test framework using 
 [procedural macros](https://doc.rust-lang.org/reference/procedural-macros.html).
 
 ## Examples
 
-Example with a single argument:
-
-```rust
-#[test_case(13)]
-#[test_case(42)]
-fn one_arg(x: u32) {
-    assert!(x == 13 || x == 42)
-}
-```
-
-The test cases above will be parsed at compile time and two rust test functions will be generated instead:
+This example will not panic:
 
 ```rust
 #[test]
-fn one_arg_13() {
-    x = 13;
-    assert!(x == 13 || x == 42)
-}
- 
-#[test]
-fn one_arg_42() {
-    x = 42;
-    assert!(x == 13 || x == 42)
+#[timeout(100)]
+fn no_timeout() {
+    let fifty_millis = time::Duration::from_millis(50);
+    thread::sleep(fifty_millis);
 }
 ```
 
-For more examples and information read the [documentation](https://docs.rs/ntest_test_cases/).
+This example will panic. The function panics after 10 milliseconds:
+
+```rust
+#[test]
+#[timeout(10)]
+#[should_panic]
+fn timeout() {    
+	let fifty_millis = time::Duration::from_millis(50);    		
+	thread::sleep(fifty_millis);}rust
+}
+```
+
+For more examples and information read the [documentation](https://docs.rs/ntest_timeout/).
