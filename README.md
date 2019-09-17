@@ -20,7 +20,7 @@ Add the *NTest library* to your developer dependencies in the *Cargo.toml* file:
 
 ```toml
 [dev-dependencies]
-ntest = "0.1"
+ntest = "*"
 ```
 
 Use the *NTest* functions you need. For example:

@@ -59,5 +59,5 @@ fn with_name(x: u32) {
 #[test_case(15)]
 #[should_panic(expected = "I am panicing")]
 fn attributes_test_case(x: u32) {
-    panic!("I am panicing");
+    panic!("I am panicing {}", x);
 }
