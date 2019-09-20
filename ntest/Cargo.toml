@@ -1,6 +1,6 @@
 [package]
 name = "ntest"
-version = "0.3.0"
+version = "0.3.1"
 authors = [ "Armin Becher <becherarmin@gmail.com>",]
 edition = "2018"
 description = "Testing framework for rust which enhances the built-in library with some useful features."
@@ -14,6 +14,12 @@ documentation = "https://docs.rs/ntest"
 [lib]
 path = "src/lib.rs"
 
+[dependencies]
+timebomb = "0.1.2"
+
+[dev-dependencies]
+timebomb = "0.1.2"
+
 [badges.gitlab]
 repository = "becheran/ntest"
 branch = "master"
@@ -24,24 +30,18 @@ status = "actively-developed"
 [profile.dev]
 panic = "unwind"
 
-[dependencies]
-timebomb = "0.1.2"
-
-[dev-dependencies]
-timebomb = "0.1.2"
-
 [dependencies.ntest_test_cases]
-version = "0.3.0"
+version = "0.3.1"
 path = "../ntest_test_cases"
 
 [dependencies.ntest_timeout]
-version = "0.3.0"
+version = "0.3.1"
 path = "../ntest_timeout"
 
 [dev-dependencies.ntest_test_cases]
-version = "0.3.0"
+version = "0.3.1"
 path = "../ntest_test_cases"
 
 [dev-dependencies.ntest_timeout]
-version = "0.3.0"
+version = "0.3.1"
 path = "../ntest_timeout"
