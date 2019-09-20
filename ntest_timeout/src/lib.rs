@@ -47,7 +47,7 @@ pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
     assert_other_timeouts(&input);
     let result = quote! {
         fn #name() {
-            ntest::timebomb::timeout_ms(|| {
+            timebomb::timeout_ms(|| {
             #body
             }, #time_ms);
          }
