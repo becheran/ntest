@@ -1,3 +1,4 @@
+extern crate ntest;
 extern crate ntest_timeout;
 use ntest_timeout::timeout;
 use std::{thread, time};

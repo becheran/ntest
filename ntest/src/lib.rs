@@ -14,6 +14,7 @@ mod traits;
 #[doc(inline)]
 pub use crate::traits::MaxDifference;
 
+// Reexport crates used in procedural macros
 #[doc(hidden)]
 pub extern crate timebomb;
 
