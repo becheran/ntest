@@ -6,6 +6,7 @@ extern crate timebomb;
 
 use proc_macro::TokenStream;
 use quote::quote;
+
 use syn::parse_macro_input;
 
 /// The timeout attribute can be used for tests to timeout after a given time.
@@ -36,22 +37,22 @@ use syn::parse_macro_input;
 ///     thread::sleep(fifty_millis);
 /// }
 /// ```
-
 #[proc_macro_attribute]
 pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::ItemFn);
     let attribute_args = parse_macro_input!(attr as syn::AttributeArgs);
     let name = &input.sig.ident;
     let body = &input.block;
-    let timeout_ms = get_timeout(&attribute_args);
+    let time_ms = get_timeout(&attribute_args);
     assert_other_timeouts(&input);
     let result = quote! {
         fn #name() {
             timebomb::timeout_ms(|| {
             #body
-            }, #timeout_ms);
+            }, #time_ms);
          }
     };
+
     result.into()
 }
 

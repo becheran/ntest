@@ -24,6 +24,12 @@ status = "actively-developed"
 [profile.dev]
 panic = "unwind"
 
+[dependencies]
+timebomb = "0.1.2"
+
+[dev-dependencies]
+timebomb = "0.1.2"
+
 [dependencies.ntest_test_cases]
 version = "0.3.0"
 path = "../ntest_test_cases"
