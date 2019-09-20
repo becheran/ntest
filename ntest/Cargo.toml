@@ -1,6 +1,6 @@
 [package]
 name = "ntest"
-version = "0.3.2"
+version = "0.3.3"
 authors = [ "Armin Becher <becherarmin@gmail.com>",]
 edition = "2018"
 description = "Testing framework for rust which enhances the built-in library with some useful features."
@@ -21,19 +21,19 @@ timebomb = "0.1.2"
 timebomb = "0.1.2"
 
 [dependencies.ntest_test_cases]
-version = "0.3.2"
+version = "0.3.3"
 path = "../ntest_test_cases"
 
 [dependencies.ntest_timeout]
-version = "0.3.2"
+version = "0.3.3"
 path = "../ntest_timeout"
 
 [dev-dependencies.ntest_test_cases]
-version = "0.3.2"
+version = "0.3.3"
 path = "../ntest_test_cases"
 
 [dev-dependencies.ntest_timeout]
-version = "0.3.2"
+version = "0.3.3"
 path = "../ntest_timeout"
 
 [badges.gitlab]
