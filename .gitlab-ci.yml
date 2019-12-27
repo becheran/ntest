@@ -6,7 +6,8 @@ link-checker-mlc:
   stage: build
   image: rust:latest
   script:
-    - cargo install mlc --verbose
+    - curl https://gitlab.com/becheran/mlc/uploads/195ff024ebc575774185b79fa7adaa5d/mlc -o mlc
+    - ./mlc
 
 rust-latest:
   stage: build
