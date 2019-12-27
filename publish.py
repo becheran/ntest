@@ -63,11 +63,15 @@ def main():
     version = read_current_version()
     print('Current version is {}'.format(version))
     version.update(update_type)
-    print('Updated to version {}'.format(version))
-    update_version_in_files(str(version))
-    deploy_crate()
-    print('Add tag and push via git.')
-    git_push_with_tag(version)
+    print('Update to version {}?'.format(version))
+    char = input('Enter "y" to continue.')
+    if char != 'y':
+        print('Do not forget to update the changelog.')
+        os.system("nano CHANGELOG.md")
+        update_version_in_files(str(version))
+        deploy_crate()
+        print('Add tag and push via git.')
+        git_push_with_tag(version)
 
 def deploy_crate():
     subprocess.run(["cargo", "publish", "--verbose" ,"--manifest-path", "ntest_test_cases/Cargo.toml", "--allow-dirty"])
