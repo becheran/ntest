@@ -9,14 +9,15 @@ link-checker-mlc:
     - curl https://gitlab.com/becheran/mlc/uploads/195ff024ebc575774185b79fa7adaa5d/mlc -o mlc
     - chmod +x mlc
     - ./mlc
+  allow_failure: true
 
-rust-latest:
+build-rust-latest:
   stage: build
   image: rust:latest
   script:
     - cargo build --verbose
 
-rust-nightly:
+build-rust-nightly:
   stage: build
   image: rustlang/rust:nightly
   script:
