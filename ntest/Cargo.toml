@@ -7,7 +7,7 @@ description = "Testing framework for rust which enhances the built-in library wi
 keywords = [ "test", "tests", "unit", "testing",]
 categories = [ "development-tools", "development-tools::testing",]
 readme = "README.md"
-license-file = "LICENSE"
+license = "MIT"
 repository = "https://gitlab.com/becheran/ntest"
 documentation = "https://docs.rs/ntest"
 

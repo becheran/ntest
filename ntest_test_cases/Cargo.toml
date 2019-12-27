@@ -7,7 +7,7 @@ description = "Test cases for ntest framework."
 keywords = [ "test", "tests", "unit", "testing", "test-cases",]
 categories = [ "development-tools", "development-tools::testing",]
 readme = "README.md"
-license-file = "LICENSE"
+license = "MIT"
 repository = "https://gitlab.com/becheran/ntest"
 documentation = "https://docs.rs/ntest"
 

@@ -1,13 +1,13 @@
 # NTest
 
-Testing framework for rust which enhances the built-in library with some useful features. Inspired by the *.Net* unit-testing framework 
-[NUnit](https://github.com/nunit/nunit). 
+Testing framework for rust which enhances the built-in library with some useful features. Inspired by the *.Net* unit-testing framework [NUnit](https://github.com/nunit/nunit).
 
 - [documentation](https://docs.rs/ntest/)
 - [library on crates.io](https://crates.io/crates/ntest)
 
 ## Getting Started
-Some functions of *NTest* use [procedural macros](https://doc.rust-lang.org/reference/procedural-macros.html) which are stable for rust edition 2018. 
+
+Some functions of *NTest* use [procedural macros](https://doc.rust-lang.org/reference/procedural-macros.html) which are stable for rust edition 2018.
 If you use the library make sure that you are using the *2018 version* of rust. Update the *Cargo.toml* file:
 
 ```toml
@@ -46,8 +46,14 @@ fn test_http_link_types(link: &str) {
 
 For more information read the [documentation](https://docs.rs/ntest/).
 
+## Changelog
+
+Checkout the [changelog file](https://gitlab.com/becheran/ntest/blob/master/CHANGELOG.md) to see the changes between different versions.
+
 ## Contribution
+
 All contributions and comments welcome! Open an issue or create a Pull Request whenever you find a bug or have an idea to improve this crate.
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+This project is licensed under the MIT License - see the [LICENSE](https://gitlab.com/becheran/ntest/blob/master/LICENSE) file for details.
