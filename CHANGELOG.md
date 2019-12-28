@@ -12,6 +12,16 @@ Types for Changes:
 
 <!-- next-header -->
 
+## [0.4.0]
+
+### Removed
+
+* Timebomb dependency
+
+### Changed
+
+* Timeout will only panic after the test execution if the test took longer than the defined time
+
 ## [0.3.4]
 
 ### Added
