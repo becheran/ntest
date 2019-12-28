@@ -14,9 +14,6 @@ mod traits;
 #[doc(inline)]
 pub use crate::traits::MaxDifference;
 
-#[doc(hidden)]
-pub extern crate timebomb;
-
 /// Compare floating point values or vectors of floating points wether they are approximately equal.
 /// The default value for epsilon is `1.0e-6`.
 ///

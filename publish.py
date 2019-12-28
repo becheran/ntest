@@ -5,6 +5,7 @@ from enum import Enum
 import argparse
 import subprocess
 import time
+import sys
 
 FILE_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -63,9 +64,9 @@ def main():
     version = read_current_version()
     print('Current version is {}'.format(version))
     version.update(update_type)
-    print('Update to version {}?'.format(version))
-    char = input('Enter "y" to continue.')
-    if char != 'y':
+    print('Update to version {}? Press y to continue'.format(version))
+    char = sys.stdin.read(1)
+    if char == 'y':
         print('Do not forget to update the changelog.')
         os.system("nano CHANGELOG.md")
         update_version_in_files(str(version))

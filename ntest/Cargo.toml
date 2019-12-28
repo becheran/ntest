@@ -14,12 +14,6 @@ documentation = "https://docs.rs/ntest"
 [lib]
 path = "src/lib.rs"
 
-[dependencies]
-timebomb = "0.1.2"
-
-[dev-dependencies]
-timebomb = "0.1.2"
-
 [dependencies.ntest_test_cases]
 version = "0.3.4"
 path = "../ntest_test_cases"

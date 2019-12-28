@@ -12,7 +12,7 @@ Types for Changes:
 
 <!-- next-header -->
 
-## [Unreleased] - ReleaseDate
+## [0.3.4]
 
 ### Added
 

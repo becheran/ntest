@@ -2,17 +2,16 @@
 
 extern crate proc_macro;
 extern crate syn;
-extern crate timebomb;
 
 use proc_macro::TokenStream;
 use quote::quote;
 
 use syn::parse_macro_input;
 
-/// The timeout attribute can be used for tests to timeout after a given time.
+/// The timeout attribute can be used for tests to let them fail if they exceed a certain execution time.
 /// With the `#[timeout]` attribute a timeout in milliseconds is added to a test.
 ///
-/// The function input must be of type `int`. For example `#[timeout(10)]` will timeout after 10 milliseconds.
+/// The function input must be of type `int`. For example `#[timeout(10)]` will fail if the test takes longer than 10 milliseconds.
 ///
 /// # Examples
 ///
@@ -26,7 +25,7 @@ use syn::parse_macro_input;
 /// }
 /// ```
 ///
-/// This example will panic. The function panics after 10 milliseconds
+/// This example will panic.
 ///
 /// ```ignore
 /// #[test]
@@ -47,9 +46,11 @@ pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
     assert_other_timeouts(&input);
     let result = quote! {
         fn #name() {
-            timebomb::timeout_ms(|| {
+            let ntest_timeout_now = std::time::Instant::now();
             #body
-            }, #time_ms);
+            if ntest_timeout_now.elapsed().as_millis() > #time_ms {
+                panic!("Timeout! The function call took {} ms. Timeout was set to {} ms", ntest_timeout_now.elapsed().as_millis(), #time_ms);
+            }
          }
     };
 
@@ -85,7 +86,7 @@ fn assert_other_timeouts(input: &syn::ItemFn) {
     }
 }
 
-fn get_timeout(attribute_args: &syn::AttributeArgs) -> u32 {
+fn get_timeout(attribute_args: &syn::AttributeArgs) -> u128 {
     if attribute_args.len() > 1 {
         panic!("Only one integer expected. Example: #[timeout(10)]");
     }
@@ -94,7 +95,7 @@ fn get_timeout(attribute_args: &syn::AttributeArgs) -> u32 {
             panic!("Integer expected. Example: #[timeout(10)]");
         }
         syn::NestedMeta::Lit(lit) => match lit {
-            syn::Lit::Int(int) => return int.base10_parse::<u32>().expect("Integer expected"),
+            syn::Lit::Int(int) => return int.base10_parse::<u128>().expect("Integer expected"),
             _ => {
                 panic!("Integer as timeout in ms expected. Example: #[timeout(10)]");
             }
