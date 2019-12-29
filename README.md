@@ -1,5 +1,10 @@
 # NTest
 
+[![](http://meritbadge.herokuapp.com/ntest)](https://crates.io/crates/ntest)
+[![](https://badgen.net/crates/d/ntest)](https://crates.io/crates/ntest)
+[![Build Status](https://gitlab.com/becheran/ntest_ci/badges/master/pipeline.svg)](https://gitlab.com/becheran/ntest_ci/pipelines)
+[![](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Testing framework for rust which enhances the built-in library with some useful features. Inspired by the *.Net* unit-testing framework [NUnit](https://github.com/nunit/nunit).
 
 - [documentation](https://docs.rs/ntest/)
@@ -48,7 +53,7 @@ For more information read the [documentation](https://docs.rs/ntest/).
 
 ## Changelog
 
-Checkout the [changelog file](https://gitlab.com/becheran/ntest/blob/master/CHANGELOG.md) to see the changes between different versions.
+Checkout the [changelog file](https://github.com/becheran/ntest/blob/master/CHANGELOG.md) to see the changes between different versions.
 
 ## Contribution
 
@@ -56,4 +61,4 @@ All contributions and comments welcome! Open an issue or create a Pull Request w
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](https://gitlab.com/becheran/ntest/blob/master/LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/becheran/ntest/blob/master/LICENSE) file for details.
