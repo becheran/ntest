@@ -12,6 +12,12 @@ Types for Changes:
 
 <!-- next-header -->
 
+## [0.4.1]
+
+### Changed
+
+* Moved to GitHub
+
 ## [0.4.0]
 
 ### Removed
