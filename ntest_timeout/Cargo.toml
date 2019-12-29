@@ -8,7 +8,7 @@ keywords = [ "test", "tests", "unit", "testing", "timeout",]
 categories = [ "development-tools", "development-tools::testing",]
 readme = "README.md"
 license = "MIT"
-repository = "https://gitlab.com/becheran/ntest"
+repository = "https://github.com/becheran/ntest"
 documentation = "https://docs.rs/ntest"
 
 [lib]
