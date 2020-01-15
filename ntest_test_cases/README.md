@@ -23,7 +23,7 @@ fn one_arg_13() {
     x = 13;
     assert!(x == 13 || x == 42)
 }
- 
+
 #[test]
 fn one_arg_42() {
     x = 42;

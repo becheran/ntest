@@ -15,6 +15,7 @@ Types for Changes:
 ### Changed
 
 * Add name attribute for test cases additionaly to the test_name attribute.
+* Repalce string special characters with something meaningfull instead of a `_`-character.
 
 ## [0.4.1]
 

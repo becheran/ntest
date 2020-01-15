@@ -17,8 +17,9 @@ mod syn_helper;
 ///
 /// The function input can be of type `int`, `bool`, or `str`.
 ///
-/// Please note that test functions can only contain alphanumeric characters and '_' signs.
-/// Special characters will be escaped using the '_' sign.
+/// Please note that rust functions can only contain alphanumeric characters and '_' signs.
+/// Special characters will be escaped using a meaning full replacement (for example `#` will be replaced with `_hash`),
+/// or as a default the '_' sign.
 ///
 /// WARNING!
 /// It is currently not possible to have negative numbers as macro input. For example
