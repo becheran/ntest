@@ -1,6 +1,6 @@
 [package]
 name = "ntest"
-version = "0.4.0"
+version = "0.5.0"
 authors = [ "Armin Becher <becherarmin@gmail.com>",]
 edition = "2018"
 description = "Testing framework for rust which enhances the built-in library with some useful features."
@@ -15,19 +15,19 @@ documentation = "https://docs.rs/ntest"
 path = "src/lib.rs"
 
 [dependencies.ntest_test_cases]
-version = "0.4.0"
+version = "0.5.0"
 path = "../ntest_test_cases"
 
 [dependencies.ntest_timeout]
-version = "0.4.0"
+version = "0.5.0"
 path = "../ntest_timeout"
 
 [dev-dependencies.ntest_test_cases]
-version = "0.4.0"
+version = "0.5.0"
 path = "../ntest_test_cases"
 
 [dev-dependencies.ntest_timeout]
-version = "0.4.0"
+version = "0.5.0"
 path = "../ntest_timeout"
 
 [badges.gitlab]
