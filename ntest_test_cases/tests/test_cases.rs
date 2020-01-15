@@ -43,13 +43,13 @@ fn test_mix(x: bool, y: &str, z: u16) {
     assert_eq!(z, 1);
 }
 
-#[test_case(42, test_name="my_fancy_test")]
+#[test_case(42, name="my_fancy_test")]
 fn with_name(x: u32) {
     assert_eq!(x, 42)
 }
 
 
-#[test_case(42, test_name="my_snd_fancy_testSPECIALCHARS^$(*")]
+#[test_case(42, name="my_snd_fancy_testSPECIALCHARS^$(*")]
 fn with_name(x: u32) {
     assert_eq!(x, 42)
 }

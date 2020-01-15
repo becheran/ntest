@@ -34,7 +34,7 @@ Use the *NTest* functions you need. For example:
 use test_case_derive::test_case;
 
 #[test_case("https://doc.rust-lang.org.html")]
-#[test_case("http://www.website.php")]
+#[test_case("http://www.website.php", name="important_test")]
 fn test_http_link_types(link: &str) {
     test_link(link, &LinkType::HTTP);
 }

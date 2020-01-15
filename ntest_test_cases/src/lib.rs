@@ -14,7 +14,7 @@ mod syn_helper;
 /// With the `#[test_case]` attribute multiple tests will be generated using the
 /// [Procedural Macros](https://blog.rust-lang.org/2018/12/21/Procedural-Macros-in-Rust-2018.html)
 /// capabilities of rust.
-/// 
+///
 /// The function input can be of type `int`, `bool`, or `str`.
 ///
 /// Please note that test functions can only contain alphanumeric characters and '_' signs.
@@ -25,7 +25,7 @@ mod syn_helper;
 /// this `#[test_case(-13)]` will not work.
 ///
 /// A function annoteded with a `#[test_case]` attribute will be split into multiple rust functions annoteded with the `#[test]` attribute.
-/// 
+///
 /// # Examples
 ///
 /// Example with a single argument
@@ -44,7 +44,7 @@ mod syn_helper;
 ///     x = 13;
 ///     assert!(x == 13 || x == 42)
 /// }
-/// 
+///
 /// #[test]
 /// fn one_arg_42() {
 ///     x = 42;
@@ -62,18 +62,18 @@ mod syn_helper;
 /// }
 /// ```
 ///
-/// Example with test_name attribute:
+/// Example with name attribute:
 /// ```ignore
-/// #[test_case(42, test_name="my_fancy_test")]
+/// #[test_case(42, name="my_fancy_test")]
 /// fn with_name(x: u32) {
 ///     assert_eq!(x, 42)
 /// }
 /// ```
-/// 
-/// Example with rust test attributes. 
+///
+/// Example with rust test attributes.
 /// All attributes after a test case will be appended after the generated `#[test]` attribute.
 /// For example the following test cases...
-/// 
+///
 /// ```ignore
 /// #[test_case(18)]
 /// #[ignore]
@@ -83,9 +83,9 @@ mod syn_helper;
 ///     panic!("I am panicing");
 /// }
 /// ```
-/// 
-/// ... will be compiled to these two tests. One gets ignored and the other suceeds: 
-/// 
+///
+/// ... will be compiled to these two tests. One gets ignored and the other suceeds:
+///
 ///  ```ignore
 /// #[test]
 /// #[ignore]
@@ -93,7 +93,7 @@ mod syn_helper;
 ///     let x = 18;
 ///     panic!("I am panicing");
 /// }
-/// 
+///
 /// #[test]
 /// #[should_panic(expected = "I am panicing")]
 /// fn attributes_test_case_15() {
@@ -133,7 +133,6 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
     result.into()
 }
 
-
 fn collect_function_arg_idents(input: &syn::ItemFn) -> Vec<syn::Ident> {
     let mut fn_args_idents: Vec<syn::Ident> = vec![];
     let fn_args = &input.sig.inputs;
@@ -171,11 +170,11 @@ fn collect_test_descriptions(
     let fn_name = input.sig.ident.to_string();
     let test_case_parameter = parse_test_case_attributes(&attribute_args);
     let test_name = calculate_test_name(&test_case_parameter, &fn_name);
-    let curr_test_attributes = TestDescription{
-        literals : test_case_parameter.literals, 
-        name : test_name, 
-        attributes: vec![]
-        };
+    let curr_test_attributes = TestDescription {
+        literals: test_case_parameter.literals,
+        name: test_name,
+        attributes: vec![],
+    };
     test_case_descriptions.push(curr_test_attributes);
     for attribute in &input.attrs {
         let meta = attribute.parse_meta();
@@ -186,7 +185,11 @@ fn collect_test_descriptions(
                     if identifier == "test_case" {
                         panic!("Test case attributes need at least one argument such as #[test_case(42)].");
                     } else {
-                        test_case_descriptions.last_mut().unwrap().attributes.push(attribute.clone());
+                        test_case_descriptions
+                            .last_mut()
+                            .unwrap()
+                            .attributes
+                            .push(attribute.clone());
                     }
                 }
                 syn::Meta::List(ml) => {
@@ -195,18 +198,26 @@ fn collect_test_descriptions(
                         let argument_args: syn::AttributeArgs = ml.nested.into_iter().collect();
                         let test_case_parameter = parse_test_case_attributes(&argument_args);
                         let test_name = calculate_test_name(&test_case_parameter, &fn_name);
-                        let curr_test_attributes = TestDescription{
-                            literals : test_case_parameter.literals, 
-                            name : test_name, 
-                            attributes: vec![]
-                            };
+                        let curr_test_attributes = TestDescription {
+                            literals: test_case_parameter.literals,
+                            name: test_name,
+                            attributes: vec![],
+                        };
                         test_case_descriptions.push(curr_test_attributes);
                     } else {
-                        test_case_descriptions.last_mut().unwrap().attributes.push(attribute.clone());
+                        test_case_descriptions
+                            .last_mut()
+                            .unwrap()
+                            .attributes
+                            .push(attribute.clone());
                     }
                 }
                 syn::Meta::NameValue(_) => {
-                        test_case_descriptions.last_mut().unwrap().attributes.push(attribute.clone());
+                    test_case_descriptions
+                        .last_mut()
+                        .unwrap()
+                        .attributes
+                        .push(attribute.clone());
                 }
             },
             Err(e) => panic!("Could not determine meta data. Error {}.", e),
@@ -235,7 +246,7 @@ fn parse_test_case_attributes(attr: &syn::AttributeArgs) -> TestCaseAttributes {
                 }
                 syn::Meta::NameValue(nv) => {
                     let identifier = nv.path.get_ident().expect("Expected identifier!");
-                    if identifier == "test_name" {
+                    if identifier == "test_name" || identifier == "name" {
                         if custom_name.is_some() {
                             panic!("Test name can only be defined once.");
                         }
@@ -243,7 +254,7 @@ fn parse_test_case_attributes(attr: &syn::AttributeArgs) -> TestCaseAttributes {
                             syn::Lit::Str(_) => {
                                 custom_name = Some(syn_helper::lit_to_str(&nv.lit));
                             }
-                            _ => unimplemented!("Unexpected type for test_name. Expected string."),
+                            _ => unimplemented!("Unexpected type for test name. Expected string."),
                         }
                     } else {
                         panic!("Unexpected identifier '{}'", identifier)
@@ -270,7 +281,7 @@ fn calculate_test_name(attr: &TestCaseAttributes, fn_name: &str) -> String {
                 name.push_str(&format!("_{}", syn_helper::lit_to_str(&lit)));
             }
         }
-        Some(custom_name) => {name = custom_name.to_string()},
+        Some(custom_name) => name = custom_name.to_string(),
     }
     name
 }
