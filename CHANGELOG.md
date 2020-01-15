@@ -12,6 +12,8 @@ Types for Changes:
 
 <!-- next-header -->
 
+## [0.5.0]
+
 ### Changed
 
 * Add name attribute for test cases additionaly to the test_name attribute.
