@@ -55,10 +55,6 @@ For more information read the [documentation](https://docs.rs/ntest/).
 
 Checkout the [changelog file](https://github.com/becheran/ntest/blob/master/CHANGELOG.md) to see the changes between different versions.
 
-## Contribution
-
-All contributions and comments welcome! Open an issue or create a Pull Request whenever you find a bug or have an idea to improve this crate.
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/becheran/ntest/blob/master/LICENSE) file for details.
