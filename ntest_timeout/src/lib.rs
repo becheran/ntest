@@ -2,6 +2,7 @@
 
 extern crate proc_macro;
 extern crate syn;
+use proc_macro2::{Ident, Span};
 
 use proc_macro::TokenStream;
 use quote::quote;
@@ -16,7 +17,8 @@ use syn::parse_macro_input;
 /// # Examples
 ///
 /// This example will not panic
-/// ```ignore
+///
+/// ```
 /// #[test]
 /// #[timeout(100)]
 /// fn no_timeout() {
@@ -27,7 +29,7 @@ use syn::parse_macro_input;
 ///
 /// This example will panic.
 ///
-/// ```ignore
+/// ```
 /// #[test]
 /// #[timeout(10)]
 /// #[should_panic]
@@ -36,28 +38,49 @@ use syn::parse_macro_input;
 ///     thread::sleep(fifty_millis);
 /// }
 /// ```
+///
+/// Also works with test functions using a Result:
+///
+/// ```
+/// #[test]
+/// #[timeout(100)]
+/// fn timeout_with_result() -> Result<(), String> {
+///     let ten_millis = time::Duration::from_millis(10);
+///     thread::sleep(ten_millis);
+///     Ok(())
+/// }
+/// ```
 #[proc_macro_attribute]
 pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::ItemFn);
     let attribute_args = parse_macro_input!(attr as syn::AttributeArgs);
-    let name = &input.sig.ident;
+    let sig = &input.sig;
+    let sig_helper_ident = &Ident::new(
+        &format!("{}_ntest_helper", input.sig.ident.to_string()),
+        Span::call_site(),
+    );
+    let mut sig_helper = input.sig.clone();
+    sig_helper.ident = (*sig_helper_ident).clone();
     let body = &input.block;
     let time_ms = get_timeout(&attribute_args);
-    assert_other_timeouts(&input);
+    check_other_attributes(&input);
     let result = quote! {
-        fn #name() {
+        #sig {
             let ntest_timeout_now = std::time::Instant::now();
-            #body
+            let ntest_result = #sig_helper_ident();
             if ntest_timeout_now.elapsed().as_millis() > #time_ms {
-                panic!("Timeout! The function call took {} ms. Timeout was set to {} ms", ntest_timeout_now.elapsed().as_millis(), #time_ms);
+                panic!("timeout: the function call took {} ms instead of {} ms", ntest_timeout_now.elapsed().as_millis(), #time_ms);
             }
+            ntest_result
          }
-    };
 
+        #sig_helper
+        #body
+    };
     result.into()
 }
 
-fn assert_other_timeouts(input: &syn::ItemFn) {
+fn check_other_attributes(input: &syn::ItemFn) {
     for attribute in &input.attrs {
         let meta = attribute.parse_meta();
         match meta {

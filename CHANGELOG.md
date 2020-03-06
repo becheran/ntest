@@ -12,6 +12,10 @@ Types for Changes:
 
 <!-- next-header -->
 
+### Added 
+
+* Timeout feature for test functions returning a result.
+
 ## [0.5.0]
 
 ### Changed
