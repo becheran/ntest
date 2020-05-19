@@ -2,11 +2,9 @@
 
 extern crate proc_macro;
 extern crate syn;
-use proc_macro2::{Ident, Span};
 
 use proc_macro::TokenStream;
 use quote::quote;
-use proc_macro_crate::crate_name;
 
 use syn::parse_macro_input;
 
@@ -56,16 +54,17 @@ pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::ItemFn);
     let time_ms = get_timeout(&parse_macro_input!(attr as syn::AttributeArgs));
     let sig = &input.sig;
+    let output = &sig.output;
     let body = &input.block;
     check_other_attributes(&input);
     let result = quote! {
         #sig {
-            fn ntest_callback()
+            fn ntest_callback() #output
             #body
             let ntest_timeout_now = std::time::Instant::now();
-            let no_timeout = ntest::execute_with_timeout(&ntest_callback, #time_ms as u64);
-            if !no_timeout {
-                panic!("timeout: the function call took {} ms. Max time {} ms", ntest_timeout_now.elapsed().as_millis(), #time_ms);
+            match ntest::execute_with_timeout(&ntest_callback, #time_ms as u64) {
+                Some(result) => return result,
+                None => panic!("timeout: the function call took {} ms. Max time {} ms", ntest_timeout_now.elapsed().as_millis(), #time_ms),
             }
         }
     };

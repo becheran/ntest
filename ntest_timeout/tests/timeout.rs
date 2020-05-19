@@ -24,7 +24,6 @@ fn timeout_inf_loop() {
     loop {}
 }
 
-/*TODO
 #[test]
 #[timeout(100)]
 fn timeout_with_result() -> Result<(), String> {
@@ -32,4 +31,3 @@ fn timeout_with_result() -> Result<(), String> {
     thread::sleep(ten_millis);
     Ok(())
 }
-*/

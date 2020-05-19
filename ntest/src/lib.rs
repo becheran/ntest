@@ -2,6 +2,7 @@
 
 // Reexport procedural macros
 extern crate ntest_test_cases;
+
 #[doc(inline)]
 pub use ntest_test_cases::test_case;
 
@@ -20,19 +21,21 @@ pub use crate::traits::MaxDifference;
 
 #[doc(hidden)]
 /// Timeout helper for proc macro
-pub fn execute_with_timeout(code: &'static (dyn Fn() + Sync + 'static), timeout_ms: u64) -> bool {
+pub fn execute_with_timeout<T: Send>(
+    code: &'static (dyn Fn() -> T + Sync + 'static),
+    timeout_ms: u64,
+) -> Option<T> {
     let (sender, receiver) = mpsc::channel();
-    let t = thread::spawn(move || {
+    thread::spawn(move || {
         match sender.send(code()) {
             Ok(()) => {} // All good
             Err(_) => {} // Released, don't panic
         }
     });
-    let result = match receiver.recv_timeout(Duration::from_millis(timeout_ms)) {
-        Ok(_) => true,
-        Err(_) => false,
+    match receiver.recv_timeout(Duration::from_millis(timeout_ms)) {
+        Ok(t) => return Some(t),
+        Err(_) => return None,
     };
-    result
 }
 
 /// Compare floating point values or vectors of floating points wether they are approximately equal.
