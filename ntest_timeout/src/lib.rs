@@ -26,15 +26,14 @@ use syn::parse_macro_input;
 /// }
 /// ```
 ///
-/// This example will panic.
+/// This example will panic and break the infinite loop after 10 milliseconds.
 ///
 /// ```
 /// #[test]
 /// #[timeout(10)]
 /// #[should_panic]
 /// fn timeout() {
-///     let fifty_millis = time::Duration::from_millis(50);
-///     thread::sleep(fifty_millis);
+///     loop {};
 /// }
 /// ```
 ///

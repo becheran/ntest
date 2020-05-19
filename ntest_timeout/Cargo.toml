@@ -1,6 +1,6 @@
 [package]
 name = "ntest_timeout"
-version = "0.5.0"
+version = "0.6.0"
 authors = [ "Armin Becher <armin.becher@gmail.com>",]
 edition = "2018"
 description = "Timeout attribute for the ntest framework."
@@ -25,5 +25,5 @@ version = "1.0"
 features = [ "full",]
 
 [dev-dependencies.ntest]
-version = "0.5.0"
+version = "0.6.0"
 path = "../ntest"

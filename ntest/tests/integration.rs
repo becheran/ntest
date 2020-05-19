@@ -1,6 +1,6 @@
 use ntest_test_cases::test_case;
 use std::{thread, time};
-use ntest::*;
+use ntest::timeout;
 
 #[test_case(200)]
 #[timeout(100)]

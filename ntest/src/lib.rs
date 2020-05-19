@@ -20,7 +20,7 @@ mod traits;
 pub use crate::traits::MaxDifference;
 
 #[doc(hidden)]
-/// Timeout helper for proc macro
+/// Timeout helper for proc macro timeout
 pub fn execute_with_timeout<T: Send>(
     code: &'static (dyn Fn() -> T + Sync + 'static),
     timeout_ms: u64,
