@@ -18,6 +18,13 @@ fn timeout() {
 }
 
 #[test]
+#[ntest::timeout(10)]
+#[should_panic]
+fn timeout_inf_loop() {
+    loop {}
+}
+
+#[test]
 #[timeout(100)]
 fn timeout_with_result() -> Result<(), String> {
     let ten_millis = time::Duration::from_millis(10);
