@@ -6,6 +6,7 @@ use proc_macro2::{Ident, Span};
 
 use proc_macro::TokenStream;
 use quote::quote;
+use proc_macro_crate::crate_name;
 
 use syn::parse_macro_input;
 
@@ -53,29 +54,20 @@ use syn::parse_macro_input;
 #[proc_macro_attribute]
 pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::ItemFn);
-    let attribute_args = parse_macro_input!(attr as syn::AttributeArgs);
+    let time_ms = get_timeout(&parse_macro_input!(attr as syn::AttributeArgs));
     let sig = &input.sig;
-    let sig_helper_ident = &Ident::new(
-        &format!("{}_ntest_helper", input.sig.ident.to_string()),
-        Span::call_site(),
-    );
-    let mut sig_helper = input.sig.clone();
-    sig_helper.ident = (*sig_helper_ident).clone();
     let body = &input.block;
-    let time_ms = get_timeout(&attribute_args);
     check_other_attributes(&input);
     let result = quote! {
         #sig {
+            fn ntest_callback()
+            #body
             let ntest_timeout_now = std::time::Instant::now();
-            let ntest_result = #sig_helper_ident();
-            if ntest_timeout_now.elapsed().as_millis() > #time_ms {
-                panic!("timeout: the function call took {} ms instead of {} ms", ntest_timeout_now.elapsed().as_millis(), #time_ms);
+            let no_timeout = ntest::execute_with_timeout(&ntest_callback, #time_ms as u64);
+            if !no_timeout {
+                panic!("timeout: the function call took {} ms. Max time {} ms", ntest_timeout_now.elapsed().as_millis(), #time_ms);
             }
-            ntest_result
-         }
-
-        #sig_helper
-        #body
+        }
     };
     result.into()
 }
