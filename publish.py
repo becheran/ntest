@@ -112,9 +112,7 @@ def update_version_in_files(version: str):
         toml_content['package']['version'] = version
         toml_content['dependencies']['ntest_proc_macro_helper']['version'] = version
         toml_content['dependencies']['ntest_test_cases']['version'] = version
-        toml_content['dev-dependencies']['ntest_test_cases']['version'] = version
         toml_content['dependencies']['ntest_timeout']['version'] = version
-        toml_content['dev-dependencies']['ntest_timeout']['version'] = version
     with open(ntest_toml_path, 'w') as toml_file:
         toml_file.write(toml.dumps(toml_content))
     
