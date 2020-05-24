@@ -28,18 +28,6 @@ Add the *NTest library* to your developer dependencies in the *Cargo.toml* file:
 ntest = "*"
 ```
 
-Use the *NTest* functions you need. For example:
-
-```rust
-use test_case_derive::test_case;
-
-#[test_case("https://doc.rust-lang.org.html")]
-#[test_case("http://www.website.php", name="important_test")]
-fn test_http_link_types(link: &str) {
-    test_link(link, &LinkType::HTTP);
-}
-```
-
 ## Content
 
 - `#[timeout()]` Attribute used for timeouts in tests.
@@ -50,6 +38,51 @@ fn test_http_link_types(link: &str) {
 - `assert_panics!()` Expects block to panic. Otherwise the test fails.
 
 For more information read the [documentation](https://docs.rs/ntest/).
+
+## Examples
+
+### Create test cases
+
+```rust
+use ntest::test_case;
+
+#[test_case("https://doc.rust-lang.org.html")]
+#[test_case("http://www.website.php", name="important_test")]
+fn test_http_link_types(link: &str) {
+    test_link(link, &LinkType::HTTP);
+}
+```
+
+### Timeout for long running functions
+
+```rust
+use ntest::timeout;
+
+#[test]
+#[timeout(10)]
+#[should_panic]
+fn timeout() {
+    loop {};
+}
+```
+
+### Combine attributes
+
+```rust
+use std::{thread, time};
+use ntest::timeout;
+use ntest::test_case;
+
+#[test_case(200)]
+#[timeout(100)]
+#[should_panic]
+#[test_case(10)]
+#[timeout(100)]
+fn test_function(i : u32) {
+    let sleep_time = time::Duration::from_millis(i);
+    thread::sleep(sleep_time);
+}
+```
 
 ## Changelog
 

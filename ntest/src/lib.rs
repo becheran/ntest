@@ -2,11 +2,15 @@
 
 // Reexport procedural macros
 extern crate ntest_test_cases;
+extern crate ntest_timeout;
+pub extern crate ntest_proc_macro_helper;
+
+#[doc(hidden)]
+pub use ntest_proc_macro_helper::*;
 
 #[doc(inline)]
 pub use ntest_test_cases::test_case;
 
-extern crate ntest_timeout;
 #[doc(inline)]
 pub use ntest_timeout::timeout;
 

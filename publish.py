@@ -75,10 +75,12 @@ def main():
         git_push_with_tag(version)
 
 def deploy_crate():
-    subprocess.run(["cargo", "publish", "--verbose" ,"--manifest-path", "ntest_test_cases/Cargo.toml", "--allow-dirty"])
-    subprocess.run(["cargo", "publish", "--verbose" ,"--manifest-path", "ntest_timeout/Cargo.toml", "--allow-dirty"])
     # TODO wait till new package version was published
     timout = 5
+    subprocess.run(["cargo", "publish", "--verbose" ,"--manifest-path", "ntest_proc_macro_helper/Cargo.toml", "--allow-dirty"])
+    print('Wait {} seconds before the main lib will be published'.format(timout))
+    subprocess.run(["cargo", "publish", "--verbose" ,"--manifest-path", "ntest_test_cases/Cargo.toml", "--allow-dirty"])
+    subprocess.run(["cargo", "publish", "--verbose" ,"--manifest-path", "ntest_timeout/Cargo.toml", "--allow-dirty"])
     print('Wait {} seconds before the main lib will be published'.format(timout))
     time.sleep(timout)
     subprocess.run(["cargo", "publish", "--verbose" ,"--manifest-path", "ntest/Cargo.toml", "--allow-dirty"])
@@ -87,6 +89,7 @@ def git_push_with_tag(version: str):
     subprocess.run(["git", "add", "ntest/Cargo.toml"])
     subprocess.run(["git", "add", "ntest_test_cases/Cargo.toml"])
     subprocess.run(["git", "add", "ntest_timeout/Cargo.toml"])
+    subprocess.run(["git", "add", "ntest_proc_macro_helper/Cargo.toml"])
     subprocess.run(["git", "tag",
                     "-a", "v{}".format(version),
                     "-m Version {}".format(version)])
@@ -107,10 +110,9 @@ def update_version_in_files(version: str):
     with open(ntest_toml_path, 'r') as toml_file:
         toml_content = toml.loads(toml_file.read())
         toml_content['package']['version'] = version
+        toml_content['dependencies']['ntest_proc_macro_helper']['version'] = version
         toml_content['dependencies']['ntest_test_cases']['version'] = version
-        toml_content['dev-dependencies']['ntest_test_cases']['version'] = version
         toml_content['dependencies']['ntest_timeout']['version'] = version
-        toml_content['dev-dependencies']['ntest_timeout']['version'] = version
     with open(ntest_toml_path, 'w') as toml_file:
         toml_file.write(toml.dumps(toml_content))
     
@@ -128,6 +130,14 @@ def update_version_in_files(version: str):
         toml_content = toml.loads(toml_file.read())
         toml_content['package']['version'] = version
     with open(ntest_timeout_toml_path, 'w') as toml_file:
+        toml_file.write(toml.dumps(toml_content))
+
+    ntest_proc_macro_helper = os.path.join(
+        FILE_DIR, 'ntest_timeout', 'Cargo.toml')
+    with open(ntest_proc_macro_helper, 'r') as toml_file:
+        toml_content = toml.loads(toml_file.read())
+        toml_content['package']['version'] = version
+    with open(ntest_proc_macro_helper, 'w') as toml_file:
         toml_file.write(toml.dumps(toml_content))
 
 

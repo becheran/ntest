@@ -3,4 +3,5 @@ members = [
     "ntest",
     "ntest_timeout",
     "ntest_test_cases",
+    "ntest_proc_macro_helper",
 ]
