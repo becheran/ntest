@@ -25,5 +25,5 @@ version = "1.0"
 features = [ "full",]
 
 [dependencies.ntest_proc_macro_helper]
-version = "0.7.0"
+version = "0.7.1"
 path = "../ntest_proc_macro_helper"
