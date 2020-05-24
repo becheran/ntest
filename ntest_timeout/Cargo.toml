@@ -24,12 +24,6 @@ proc-macro-crate = "0.1.4"
 version = "1.0"
 features = [ "full",]
 
-<<<<<<< HEAD
 [dependencies.ntest_proc_macro_helper]
 version = "0.7.1"
 path = "../ntest_proc_macro_helper"
-=======
-[dev-dependencies.ntest]
-version = "0.6.0"
-path = "../ntest"
->>>>>>> origin/master

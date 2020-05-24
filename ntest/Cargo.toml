@@ -1,10 +1,6 @@
 [package]
 name = "ntest"
-<<<<<<< HEAD
 version = "0.7.1"
-=======
-version = "0.6.0"
->>>>>>> origin/master
 authors = [ "Armin Becher <becherarmin@gmail.com>",]
 edition = "2018"
 description = "Testing framework for rust which enhances the built-in library with some useful features."
