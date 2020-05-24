@@ -1,0 +1,15 @@
+[package]
+name = "ntest_proc_macro_helper"
+version = "0.6.0"
+authors = [ "Armin Becher <becherarmin@gmail.com>",]
+edition = "2018"
+description = "Provide helper functions for the procedural macros used in ntest."
+keywords = [ "test", "tests", "unit", "testing",]
+categories = [ "development-tools", "development-tools::testing",]
+readme = "README.md"
+license = "MIT"
+repository = "https://github.com/becheran/ntest"
+documentation = "https://docs.rs/ntest"
+
+[lib]
+path = "src/lib.rs"

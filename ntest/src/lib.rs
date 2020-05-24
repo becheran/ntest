@@ -10,33 +10,10 @@ extern crate ntest_timeout;
 #[doc(inline)]
 pub use ntest_timeout::timeout;
 
-use std::sync::mpsc;
-use std::thread;
-use std::time::Duration;
-
 // Reexport traits
 mod traits;
 #[doc(inline)]
 pub use crate::traits::MaxDifference;
-
-#[doc(hidden)]
-/// Timeout helper for proc macro timeout
-pub fn execute_with_timeout<T: Send>(
-    code: &'static (dyn Fn() -> T + Sync + 'static),
-    timeout_ms: u64,
-) -> Option<T> {
-    let (sender, receiver) = mpsc::channel();
-    thread::spawn(move || {
-        match sender.send(code()) {
-            Ok(()) => {} // All good
-            Err(_) => {} // Released, don't panic
-        }
-    });
-    match receiver.recv_timeout(Duration::from_millis(timeout_ms)) {
-        Ok(t) => return Some(t),
-        Err(_) => return None,
-    };
-}
 
 /// Compare floating point values or vectors of floating points wether they are approximately equal.
 /// The default value for epsilon is `1.0e-6`.

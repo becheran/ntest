@@ -11,6 +11,11 @@ Types for Changes:
 # Changelog
 
 <!-- next-header -->
+## [0.7.0]
+
+* Timeout interrupts running process.
+
+## [0.6.0]
 
 ### Added 
 

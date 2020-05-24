@@ -18,7 +18,7 @@ fn timeout() {
 }
 
 #[test]
-#[ntest::timeout(10)]
+#[timeout(10)]
 #[should_panic]
 fn timeout_inf_loop() {
     loop {}
