@@ -22,15 +22,7 @@ path = "../ntest_test_cases"
 version = "0.6.0"
 path = "../ntest_timeout"
 
-[dev-dependencies.ntest_test_cases]
-version = "0.6.0"
-path = "../ntest_test_cases"
-
-[dev-dependencies.ntest_timeout]
-version = "0.6.0"
-path = "../ntest_timeout"
-
-[dev-dependencies.ntest_proc_macro_helper]
+[dependencies.ntest_proc_macro_helper]
 version = "0.6.0"
 path = "../ntest_proc_macro_helper"
 
