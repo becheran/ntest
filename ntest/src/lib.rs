@@ -42,6 +42,12 @@ pub fn execute_with_timeout<T: Send>(
     };
 }
 
+#[doc(hidden)]
+/// Difference helper for proc macro about equal
+pub fn about_eq<T: MaxDifference>(a: T, b: T, eps: f64) -> bool {
+    a.max_diff(b) < eps
+}   
+    
 /// Compare floating point values or vectors of floating points wether they are approximately equal.
 /// The default value for epsilon is `1.0e-6`.
 ///
@@ -75,16 +81,17 @@ pub fn execute_with_timeout<T: Send>(
 /// ```
 /// # use ntest::assert_about_eq;
 /// # fn main() {
+///# // Test double usage
+///# assert_about_eq!([1.100000001, 2.1], [1.1, 2.1], 0.001f64);
 /// assert_about_eq!([1.100000001, 2.1], [1.1, 2.1], 0.001f64);
 /// # }
 /// ```
 #[macro_export]
 macro_rules! assert_about_eq {
     ($a:expr, $b:expr, $eps:expr) => {
-        use $crate::MaxDifference;
         let eps = $eps;
         assert!(
-            $a.max_diff($b) < eps,
+            $crate::about_eq($a, $b, eps),
             "assertion failed: `(left !== right)` \
              (left: `{:?}`, right: `{:?}`, epsilon: `{:?}`)",
             $a,

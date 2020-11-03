@@ -11,6 +11,9 @@ Types for Changes:
 # Changelog
 
 <!-- next-header -->
+
+* Fix import in assert_about_eq macro
+
 ## [0.7.0]
 
 * Timeout interrupts running process.
