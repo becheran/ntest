@@ -1,9 +1,9 @@
 //! The ntest lib enhances the rust test framework with some useful functions.
 
 // Reexport procedural macros
+pub extern crate ntest_proc_macro_helper;
 extern crate ntest_test_cases;
 extern crate ntest_timeout;
-pub extern crate ntest_proc_macro_helper;
 
 #[doc(hidden)]
 pub use ntest_proc_macro_helper::*;
@@ -46,8 +46,8 @@ pub fn execute_with_timeout<T: Send>(
 /// Difference helper for proc macro about equal
 pub fn about_eq<T: MaxDifference>(a: T, b: T, eps: f64) -> bool {
     a.max_diff(b) < eps
-}   
-    
+}
+
 /// Compare floating point values or vectors of floating points wether they are approximately equal.
 /// The default value for epsilon is `1.0e-6`.
 ///

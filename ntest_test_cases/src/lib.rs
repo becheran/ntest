@@ -6,7 +6,6 @@ extern crate syn;
 use proc_macro::TokenStream;
 use proc_macro2::Span;
 use quote::quote;
-use syn::export::TokenStream2;
 use syn::parse_macro_input;
 mod syn_helper;
 
@@ -112,7 +111,7 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
     let fn_body = &input.block;
     let fn_args_idents = collect_function_arg_idents(&input);
 
-    let mut result = TokenStream2::new();
+    let mut result = proc_macro2::TokenStream::new();
     for test_description in test_descriptions {
         let test_case_name = syn::Ident::new(&test_description.name, Span::call_site());
         let literals = test_description.literals;
