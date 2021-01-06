@@ -133,7 +133,7 @@ def update_version_in_files(version: str):
         toml_file.write(toml.dumps(toml_content))
 
     ntest_proc_macro_helper = os.path.join(
-        FILE_DIR, 'ntest_timeout', 'Cargo.toml')
+        FILE_DIR, 'ntest_proc_macro_helper', 'Cargo.toml')
     with open(ntest_proc_macro_helper, 'r') as toml_file:
         toml_content = toml.loads(toml_file.read())
         toml_content['package']['version'] = version
