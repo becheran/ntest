@@ -116,7 +116,7 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
         let test_case_name = syn::Ident::new(&test_description.name, Span::call_site());
         let literals = test_description.literals;
         let attributes = test_description.attributes;
-        if &literals.len() != &fn_args_idents.len() {
+        if literals.len() != fn_args_idents.len() {
             panic!("Test case arguments and function input signature mismatch.");
         }
 

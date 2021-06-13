@@ -31,13 +31,13 @@ pub trait MaxDifference {
 
 impl MaxDifference for f32 {
     fn max_diff(self, other: Self) -> f64 {
-        return f64::from((self - other).abs());
+        f64::from((self - other).abs())
     }
 }
 
 impl MaxDifference for f64 {
     fn max_diff(self, other: Self) -> f64 {
-        return (self - other).abs();
+        (self - other).abs()
     }
 }
 

@@ -17,7 +17,7 @@ pub fn execute_with_timeout<T: Send>(
         }
     });
     match receiver.recv_timeout(Duration::from_millis(timeout_ms)) {
-        Ok(t) => return Some(t),
-        Err(_) => return None,
-    };
+        Ok(t) => Some(t),
+        Err(_) => None,
+    }
 }
