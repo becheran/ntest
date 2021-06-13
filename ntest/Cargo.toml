@@ -35,3 +35,6 @@ status = "actively-developed"
 
 [profile.dev]
 panic = "unwind"
+
+[dev-dependencies]
+tokio = { version = "1.6.1", features = ["rt", "macros"] }
