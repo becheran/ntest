@@ -1,6 +1,6 @@
 [package]
 name = "ntest_proc_macro_helper"
-version = "0.7.3"
+version = "0.7.4"
 authors = [ "Armin Becher <becherarmin@gmail.com>",]
 edition = "2018"
 description = "Provide helper functions for the procedural macros used in ntest."
