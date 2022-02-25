@@ -5,6 +5,7 @@ stages:
 link-checker-mlc:
   stage: build
   image: rust:latest
+  allow_failure: true
   script:
     - curl -L https://github.com/becheran/mlc/releases/download/v0.7.0/mlc -o mlc
     - chmod +x mlc
