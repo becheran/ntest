@@ -1,7 +1,7 @@
 # NTest
 
 [![](https://docs.rs/ntest/badge.svg)](https://docs.rs/ntest)
-[![](http://meritbadge.herokuapp.com/ntest)](https://crates.io/crates/ntest)
+[![](https://img.shields.io/badge/crates.io-ntest-orange)](https://crates.io/crates/ntest)
 [![](https://badgen.net/crates/d/ntest)](https://crates.io/crates/ntest)
 [![Build Status](https://gitlab.com/becheran/ntest_ci/badges/master/pipeline.svg)](https://gitlab.com/becheran/ntest_ci/pipelines)
 [![](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
