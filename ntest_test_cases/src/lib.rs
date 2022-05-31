@@ -24,7 +24,7 @@ mod syn_helper;
 /// It is currently not possible to have negative numbers as macro input. For example
 /// this `#[test_case(-13)]` will not work.
 ///
-/// A function annoteded with a `#[test_case]` attribute will be split into multiple rust functions annoteded with the `#[test]` attribute.
+/// A function annotated with a `#[test_case]` attribute will be split into multiple rust functions annotated with the `#[test]` attribute.
 ///
 /// # Examples
 ///
@@ -101,6 +101,16 @@ mod syn_helper;
 ///     panic!("I am panicing");
 /// }
 /// ```
+///
+/// Test functions with a `Result` return are also supported:
+///
+/// ```ignore
+/// #[test_case(27)]
+/// #[test_case(33)]
+/// fn returns_result(x: u32) -> Result<(), ()> {
+///     Ok(())
+/// }
+/// ```
 #[proc_macro_attribute]
 pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = parse_macro_input!(item as syn::ItemFn);
@@ -110,6 +120,7 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
         collect_test_descriptions(&input, &attribute_args);
     let fn_body = &input.block;
     let fn_args_idents = collect_function_arg_idents(&input);
+    let fn_return = &input.sig.output;
 
     let mut result = proc_macro2::TokenStream::new();
     for test_description in test_descriptions {
@@ -123,7 +134,7 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
         let test_case_quote = quote! {
             #[test]
             #(#attributes)*
-            fn #test_case_name() {
+            fn #test_case_name() #fn_return {
                 #(let #fn_args_idents = #literals;)*
                 #fn_body
             }

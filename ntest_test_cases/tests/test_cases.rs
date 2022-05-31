@@ -61,3 +61,9 @@ fn with_name(x: u32) {
 fn attributes_test_case(x: u32) {
     panic!("I am panicing {}", x);
 }
+
+#[test_case(42)]
+fn return_result(x: u32) -> core::result::Result<(), ()> {
+    assert_eq!(x, 42);
+    Ok(())
+}
