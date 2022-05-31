@@ -85,10 +85,6 @@ fn test_function(i : u32) {
 }
 ```
 
-## Changelog
-
-Checkout the [changelog file](https://github.com/becheran/ntest/blob/master/CHANGELOG.md) to see the changes between different versions.
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/becheran/ntest/blob/master/LICENSE) file for details.

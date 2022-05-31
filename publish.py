@@ -67,8 +67,6 @@ def main():
     print('Update to version {}? Press y to continue'.format(version))
     char = sys.stdin.read(1)
     if char == 'y':
-        print('Do not forget to update the changelog.')
-        os.system("nano CHANGELOG.md")
         update_version_in_files(str(version))
         deploy_crate()
         print('Add tag and push via git.')
