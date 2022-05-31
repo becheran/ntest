@@ -15,7 +15,7 @@ fn two_args(x: u8, y: u32) {
 }
 
 #[test_case(42.42)]
-fn float(x: f32) {
+fn float(x: f64) {
     assert_eq!(x, 42.42)
 }
 

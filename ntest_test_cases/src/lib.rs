@@ -179,7 +179,7 @@ fn collect_test_descriptions(
     let mut test_case_descriptions: Vec<TestDescription> = vec![];
 
     let fn_name = input.sig.ident.to_string();
-    let test_case_parameter = parse_test_case_attributes(&attribute_args);
+    let test_case_parameter = parse_test_case_attributes(attribute_args);
     let test_name = calculate_test_name(&test_case_parameter, &fn_name);
     let curr_test_attributes = TestDescription {
         literals: test_case_parameter.literals,
@@ -289,7 +289,7 @@ fn calculate_test_name(attr: &TestCaseAttributes, fn_name: &str) -> String {
         None => {
             name.push_str(fn_name);
             for lit in &attr.literals {
-                name.push_str(&format!("_{}", syn_helper::lit_to_str(&lit)));
+                name.push_str(&format!("_{}", syn_helper::lit_to_str(lit)));
             }
         }
         Some(custom_name) => name = custom_name.to_string(),

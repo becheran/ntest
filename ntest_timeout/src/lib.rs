@@ -108,7 +108,7 @@ fn get_timeout(attribute_args: &syn::AttributeArgs) -> u128 {
             panic!("Integer expected. Example: #[timeout(10)]");
         }
         syn::NestedMeta::Lit(lit) => match lit {
-            syn::Lit::Int(int) => return int.base10_parse::<u128>().expect("Integer expected"),
+            syn::Lit::Int(int) => int.base10_parse::<u128>().expect("Integer expected"),
             _ => {
                 panic!("Integer as timeout in ms expected. Example: #[timeout(10)]");
             }

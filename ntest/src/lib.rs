@@ -30,12 +30,7 @@ pub fn execute_with_timeout<T: Send>(
     timeout_ms: u64,
 ) -> Option<T> {
     let (sender, receiver) = mpsc::channel();
-    thread::spawn(move || {        
-        match sender.send(code()) {
-            Ok(()) => {} // All good
-            Err(_) => {} // Released, don't panic
-        }
-    });
+    thread::spawn(move || if let Ok(()) = sender.send(code()) {});
     match receiver.recv_timeout(Duration::from_millis(timeout_ms)) {
         Ok(t) => Some(t),
         Err(_) => None,
