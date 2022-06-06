@@ -1,6 +1,6 @@
 [package]
 name = "ntest"
-version = "0.8.0"
+version = "0.8.1"
 authors = [ "Armin Becher <becherarmin@gmail.com>",]
 edition = "2018"
 description = "Testing framework for rust which enhances the built-in library with some useful features."
@@ -19,7 +19,7 @@ version = "0.8.0"
 path = "../ntest_test_cases"
 
 [dependencies.ntest_timeout]
-version = "0.8.0"
+version = "0.8.1"
 path = "../ntest_timeout"
 
 [dependencies.ntest_proc_macro_helper]
