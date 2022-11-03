@@ -14,7 +14,8 @@ mod syn_helper;
 /// [Procedural Macros](https://blog.rust-lang.org/2018/12/21/Procedural-Macros-in-Rust-2018.html)
 /// capabilities of rust.
 ///
-/// The function input can be of type `int`, `bool`, or `str`.
+/// The function input can be of type `int`, `bool`, or `str`, or a path to an
+/// enum or constant of those types.
 ///
 /// Please note that rust functions can only contain alphanumeric characters and '_' signs.
 /// Special characters will be escaped using a meaning full replacement (for example `#` will be replaced with `_hash`),
@@ -125,7 +126,7 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
     let mut result = proc_macro2::TokenStream::new();
     for test_description in test_descriptions {
         let test_case_name = syn::Ident::new(&test_description.name, Span::call_site());
-        let literals = test_description.literals;
+        let literals = test_description.args;
         let attributes = test_description.attributes;
         if literals.len() != fn_args_idents.len() {
             panic!("Test case arguments and function input signature mismatch.");
@@ -169,7 +170,7 @@ fn collect_function_arg_idents(input: &syn::ItemFn) -> (Vec<syn::Ident>, Vec<Box
 }
 
 struct TestDescription {
-    literals: Vec<syn::Lit>,
+    args: Vec<syn::Expr>,
     name: String,
     attributes: Vec<syn::Attribute>,
 }
@@ -184,7 +185,7 @@ fn collect_test_descriptions(
     let test_case_parameter = parse_test_case_attributes(attribute_args);
     let test_name = calculate_test_name(&test_case_parameter, &fn_name);
     let curr_test_attributes = TestDescription {
-        literals: test_case_parameter.literals,
+        args: test_case_parameter.args,
         name: test_name,
         attributes: vec![],
     };
@@ -212,7 +213,7 @@ fn collect_test_descriptions(
                         let test_case_parameter = parse_test_case_attributes(&argument_args);
                         let test_name = calculate_test_name(&test_case_parameter, &fn_name);
                         let curr_test_attributes = TestDescription {
-                            literals: test_case_parameter.literals,
+                            args: test_case_parameter.args,
                             name: test_name,
                             attributes: vec![],
                         };
@@ -240,19 +241,19 @@ fn collect_test_descriptions(
 }
 
 struct TestCaseAttributes {
-    literals: Vec<syn::Lit>,
+    args: Vec<syn::Expr>,
     custom_name: Option<String>,
 }
 
 fn parse_test_case_attributes(attr: &syn::AttributeArgs) -> TestCaseAttributes {
-    let mut literals: Vec<syn::Lit> = vec![];
+    let mut args: Vec<syn::Expr> = vec![];
     let mut custom_name: Option<String> = None;
 
     for a in attr {
         match a {
             syn::NestedMeta::Meta(m) => match m {
-                syn::Meta::Path(_) => {
-                    panic!("Path not expected.");
+                syn::Meta::Path(path) => {
+                    args.push(syn::ExprPath { attrs: vec![], qself: None, path: path.clone() }.into());
                 }
                 syn::Meta::List(_) => {
                     panic!("Metalist not expected.");
@@ -275,12 +276,12 @@ fn parse_test_case_attributes(attr: &syn::AttributeArgs) -> TestCaseAttributes {
                 }
             },
             syn::NestedMeta::Lit(lit) => {
-                literals.push((*lit).clone());
+                args.push(syn::ExprLit { attrs: vec![], lit: lit.clone() }.into());
             }
         }
     }
     TestCaseAttributes {
-        literals,
+        args,
         custom_name,
     }
 }
@@ -290,8 +291,12 @@ fn calculate_test_name(attr: &TestCaseAttributes, fn_name: &str) -> String {
     match &attr.custom_name {
         None => {
             name.push_str(fn_name);
-            for lit in &attr.literals {
-                name.push_str(&format!("_{}", syn_helper::lit_to_str(lit)));
+            for expr in &attr.args {
+                match expr {
+                    syn::Expr::Lit(lit) => name.push_str(&format!("_{}", syn_helper::lit_to_str(&lit.lit))),
+                    syn::Expr::Path(path) => name.push_str(&format!("_{}", path.path.segments.last().expect("Path to contain at least one segment").ident)),
+                    _ => unimplemented!("Unexpected expr type when calculating test name."),
+                }
             }
         }
         Some(custom_name) => name = custom_name.to_string(),
