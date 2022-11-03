@@ -119,7 +119,7 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
     let test_descriptions: Vec<TestDescription> =
         collect_test_descriptions(&input, &attribute_args);
     let fn_body = &input.block;
-    let fn_args_idents = collect_function_arg_idents(&input);
+    let (fn_args_idents, fn_args_ty) = collect_function_arg_idents(&input);
     let fn_return = &input.sig.output;
 
     let mut result = proc_macro2::TokenStream::new();
@@ -135,7 +135,7 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
             #[test]
             #(#attributes)*
             fn #test_case_name() #fn_return {
-                #(let #fn_args_idents = #literals;)*
+                #(let #fn_args_idents: #fn_args_ty = #literals;)*
                 #fn_body
             }
         };
@@ -144,8 +144,9 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
     result.into()
 }
 
-fn collect_function_arg_idents(input: &syn::ItemFn) -> Vec<syn::Ident> {
+fn collect_function_arg_idents(input: &syn::ItemFn) -> (Vec<syn::Ident>, Vec<Box<syn::Type>>) {
     let mut fn_args_idents: Vec<syn::Ident> = vec![];
+    let mut fn_types: Vec<Box<syn::Type>> = vec![];
     let fn_args = &input.sig.inputs;
     for i in fn_args {
         match i {
@@ -157,13 +158,14 @@ fn collect_function_arg_idents(input: &syn::ItemFn) -> Vec<syn::Ident> {
                     }
                     _ => panic!("Unexpected function identifier."),
                 }
+                fn_types.push(t.ty.clone());
             }
             syn::FnArg::Receiver(_) => {
                 panic!("Receiver function not expected for test case attribute.")
             }
         }
     }
-    fn_args_idents
+    (fn_args_idents, fn_types)
 }
 
 struct TestDescription {

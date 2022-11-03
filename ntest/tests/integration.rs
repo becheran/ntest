@@ -7,7 +7,7 @@ use std::{thread, time};
 #[should_panic]
 #[test_case(10)]
 #[timeout(100)]
-fn test_function(i: u32) {
+fn test_function(i: u64) {
     let sleep_time = time::Duration::from_millis(i);
     thread::sleep(sleep_time);
 }
