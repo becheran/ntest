@@ -2,13 +2,33 @@ use ntest::test_case;
 use ntest::timeout;
 use std::{thread, time};
 
+const TWO_HUNDRED: u64 = 200;
+const TEN: u64 = 10;
+
 #[test_case(200)]
 #[timeout(100)]
 #[should_panic]
 #[test_case(10)]
 #[timeout(100)]
-fn test_function(i: u32) {
+#[test_case(TWO_HUNDRED)]
+#[timeout(100)]
+#[should_panic]
+#[test_case(TEN)]
+#[timeout(100)]
+fn test_function(i: u64) {
     let sleep_time = time::Duration::from_millis(i);
+    thread::sleep(sleep_time);
+}
+
+#[repr(u8)]
+enum Test { A = 200, B = 10 }
+#[test_case(Test::A)]
+#[timeout(100)]
+#[should_panic]
+#[test_case(Test::B)]
+#[timeout(100)]
+fn test_with_enum(i: Test) {
+    let sleep_time = time::Duration::from_millis(i as u8 as _);
     thread::sleep(sleep_time);
 }
 
