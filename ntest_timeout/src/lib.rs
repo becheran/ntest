@@ -61,10 +61,15 @@ pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
             fn ntest_callback() #output
             #body
             let ntest_timeout_now = std::time::Instant::now();
-            match ntest::ntest_proc_macro_helper::execute_with_timeout(&ntest_callback, #time_ms as u64) {
-                ntest::ntest_proc_macro_helper::TimeoutResult::Result(result) => return result,
-                ntest::ntest_proc_macro_helper::TimeoutResult::Panic => panic!(),
-                ntest::ntest_proc_macro_helper::TimeoutResult::Timeout => panic!("timeout: the function call took {} ms. Max time {} ms", ntest_timeout_now.elapsed().as_millis(), #time_ms),
+            
+            let (sender, receiver) = std::sync::mpsc::channel();
+            std::thread::spawn(move || {
+                if let Ok(()) = sender.send(ntest_callback()) {}
+            });
+            match receiver.recv_timeout(std::time::Duration::from_millis(#time_ms)) {
+                Ok(t) => return t,
+                Err(std::sync::mpsc::RecvTimeoutError::Timeout) => panic!("timeout: the function call took {} ms. Max time {} ms", ntest_timeout_now.elapsed().as_millis(), #time_ms),
+                Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => panic!(),
             }
         }
     };
@@ -100,7 +105,7 @@ fn check_other_attributes(input: &syn::ItemFn) {
     }
 }
 
-fn get_timeout(attribute_args: &syn::AttributeArgs) -> u128 {
+fn get_timeout(attribute_args: &syn::AttributeArgs) -> u64 {
     if attribute_args.len() > 1 {
         panic!("Only one integer expected. Example: #[timeout(10)]");
     }
@@ -109,7 +114,7 @@ fn get_timeout(attribute_args: &syn::AttributeArgs) -> u128 {
             panic!("Integer expected. Example: #[timeout(10)]");
         }
         syn::NestedMeta::Lit(lit) => match lit {
-            syn::Lit::Int(int) => int.base10_parse::<u128>().expect("Integer expected"),
+            syn::Lit::Int(int) => int.base10_parse::<u64>().expect("Integer expected"),
             _ => {
                 panic!("Integer as timeout in ms expected. Example: #[timeout(10)]");
             }

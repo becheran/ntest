@@ -1,12 +1,8 @@
 //! The ntest lib enhances the rust test framework with some useful functions.
 
 // Reexport procedural macros
-pub extern crate ntest_proc_macro_helper;
 extern crate ntest_test_cases;
 extern crate ntest_timeout;
-
-#[doc(hidden)]
-pub use ntest_proc_macro_helper::*;
 
 #[doc(inline)]
 pub use ntest_test_cases::test_case;

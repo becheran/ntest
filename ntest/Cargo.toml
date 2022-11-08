@@ -22,10 +22,6 @@ path = "../ntest_test_cases"
 version = "0.8.1"
 path = "../ntest_timeout"
 
-[dependencies.ntest_proc_macro_helper]
-version = "0.8.0"
-path = "../ntest_proc_macro_helper"
-
 [badges.gitlab]
 repository = "becheran/ntest_ci"
 branch = "master"
