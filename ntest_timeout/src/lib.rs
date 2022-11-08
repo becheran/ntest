@@ -62,8 +62,9 @@ pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
             #body
             let ntest_timeout_now = std::time::Instant::now();
             match ntest::ntest_proc_macro_helper::execute_with_timeout(&ntest_callback, #time_ms as u64) {
-                Some(result) => return result,
-                None => panic!("timeout: the function call took {} ms. Max time {} ms", ntest_timeout_now.elapsed().as_millis(), #time_ms),
+                ntest::ntest_proc_macro_helper::TimeoutResult::Result(result) => return result,
+                ntest::ntest_proc_macro_helper::TimeoutResult::Panic => panic!(),
+                ntest::ntest_proc_macro_helper::TimeoutResult::Timeout => panic!("timeout: the function call took {} ms. Max time {} ms", ntest_timeout_now.elapsed().as_millis(), #time_ms),
             }
         }
     };
