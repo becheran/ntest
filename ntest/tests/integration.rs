@@ -86,5 +86,5 @@ async fn tokio_should_panic_timeout() {
 #[should_panic]
 #[timeout(20000)]
 fn panic() {
-    assert!(false);
+    panic!();
 }
