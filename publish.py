@@ -72,14 +72,19 @@ def main():
         print('Add tag and push via git.')
         git_push_with_tag(version)
 
+
 def deploy_crate():
     # TODO wait till new package version was published
-    timout = 5
-    subprocess.run(["cargo", "publish", "--verbose" ,"--manifest-path", "ntest_test_cases/Cargo.toml", "--allow-dirty"])
-    subprocess.run(["cargo", "publish", "--verbose" ,"--manifest-path", "ntest_timeout/Cargo.toml", "--allow-dirty"])
-    print('Wait {} seconds before the main lib will be published'.format(timout))
-    time.sleep(timout)
-    subprocess.run(["cargo", "publish", "--verbose" ,"--manifest-path", "ntest/Cargo.toml", "--allow-dirty"])
+    timeoutSec = 10
+    subprocess.run(["cargo", "publish", "--verbose", "--manifest-path",
+                    "ntest_test_cases/Cargo.toml", "--allow-dirty"])
+    subprocess.run(["cargo", "publish", "--verbose", "--manifest-path",
+                    "ntest_timeout/Cargo.toml", "--allow-dirty"])
+    print('Wait {} seconds before the main lib will be published'.format(timeoutSec))
+    time.sleep(timeoutSec)
+    subprocess.run(["cargo", "publish", "--verbose",
+                    "--manifest-path", "ntest/Cargo.toml", "--allow-dirty"])
+
 
 def git_push_with_tag(version: str):
     subprocess.run(["git", "add", "ntest/Cargo.toml"])
@@ -109,7 +114,7 @@ def update_version_in_files(version: str):
         toml_content['dependencies']['ntest_timeout']['version'] = version
     with open(ntest_toml_path, 'w') as toml_file:
         toml_file.write(toml.dumps(toml_content))
-    
+
     ntest_test_cases_toml_path = os.path.join(
         FILE_DIR, 'ntest_test_cases', 'Cargo.toml')
     with open(ntest_test_cases_toml_path, 'r') as toml_file:
@@ -117,7 +122,7 @@ def update_version_in_files(version: str):
         toml_content['package']['version'] = version
     with open(ntest_test_cases_toml_path, 'w') as toml_file:
         toml_file.write(toml.dumps(toml_content))
-    
+
     ntest_timeout_toml_path = os.path.join(
         FILE_DIR, 'ntest_timeout', 'Cargo.toml')
     with open(ntest_timeout_toml_path, 'r') as toml_file:
