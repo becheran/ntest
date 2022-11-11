@@ -3,13 +3,10 @@
 [![docs](https://docs.rs/ntest/badge.svg)](https://docs.rs/ntest)
 [![crates](https://img.shields.io/badge/crates.io-ntest-orange)](https://crates.io/crates/ntest)
 [![downloads](https://badgen.net/crates/d/ntest)](https://crates.io/crates/ntest)
-[![build status](https://gitlab.com/becheran/ntest_ci/badges/master/pipeline.svg)](https://gitlab.com/becheran/ntest_ci/pipelines)
+[![build status](https://github.com/becheran/ntest/actions/workflows/ci.yml/badge.svg)](https://github.com/becheran/ntest/actions/workflows/ci.yml)
 [![license](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Testing framework for rust which enhances the built-in library with some useful features. Inspired by the *.Net* unit-testing framework [NUnit](https://github.com/nunit/nunit).
-
-- [documentation](https://docs.rs/ntest/)
-- [library on crates.io](https://crates.io/crates/ntest)
 
 ## Getting Started
 
@@ -84,7 +81,3 @@ fn test_function(i : u32) {
     thread::sleep(sleep_time);
 }
 ```
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/becheran/ntest/blob/master/LICENSE) file for details.
