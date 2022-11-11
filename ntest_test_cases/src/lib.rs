@@ -21,10 +21,6 @@ mod syn_helper;
 /// Special characters will be escaped using a meaning full replacement (for example `#` will be replaced with `_hash`),
 /// or as a default the '_' sign.
 ///
-/// WARNING!
-/// It is currently not possible to have negative numbers as macro input. For example
-/// this `#[test_case(-13)]` will not work.
-///
 /// A function annotated with a `#[test_case]` attribute will be split into multiple rust functions annotated with the `#[test]` attribute.
 ///
 /// # Examples
@@ -85,7 +81,7 @@ mod syn_helper;
 /// }
 /// ```
 ///
-/// ... will be compiled to these two tests. One gets ignored and the other suceeds:
+/// ... will be compiled to these two tests. One gets ignored and the other succeeds:
 ///
 ///  ```ignore
 /// #[test]

@@ -20,6 +20,18 @@ fn test_function(i: u64) {
     thread::sleep(sleep_time);
 }
 
+#[test_case(1.2)]
+#[test_case(2.2)]
+fn test_f64(i: f64) {
+    print!("{}", i);
+}
+
+#[test_case(-1)]
+#[test_case(-3)]
+fn test_int(i: i64) {
+    print!("{}", i);
+}
+
 #[repr(u8)]
 enum Test { A = 200, B = 10 }
 #[test_case(Test::A)]
