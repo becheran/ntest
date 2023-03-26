@@ -52,12 +52,13 @@ use syn::parse_macro_input;
 pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::ItemFn);
     let time_ms = get_timeout(&parse_macro_input!(attr as syn::AttributeArgs));
+    let vis = &input.vis;
     let sig = &input.sig;
     let output = &sig.output;
     let body = &input.block;
     check_other_attributes(&input);
     let result = quote! {
-        #sig {
+        #vis #sig {
             fn ntest_callback() #output
             #body
             let ntest_timeout_now = std::time::Instant::now();
