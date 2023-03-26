@@ -64,10 +64,10 @@ pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
             
             let (sender, receiver) = std::sync::mpsc::channel();
             std::thread::spawn(move || {
-                if let Ok(()) = sender.send(ntest_callback()) {}
+                if let std::result::Result::Ok(()) = sender.send(ntest_callback()) {}
             });
             match receiver.recv_timeout(std::time::Duration::from_millis(#time_ms)) {
-                Ok(t) => return t,
+                std::result::Result::Ok(t) => return t,
                 Err(std::sync::mpsc::RecvTimeoutError::Timeout) => panic!("timeout: the function call took {} ms. Max time {} ms", ntest_timeout_now.elapsed().as_millis(), #time_ms),
                 Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => panic!(),
             }
@@ -80,7 +80,7 @@ fn check_other_attributes(input: &syn::ItemFn) {
     for attribute in &input.attrs {
         let meta = attribute.parse_meta();
         match meta {
-            Ok(m) => match m {
+            std::result::Result::Ok(m) => match m {
                 syn::Meta::Path(p) => {
                     let identifier = p.get_ident().expect("Expected identifier!");
                     if identifier == "timeout" {
