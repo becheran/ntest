@@ -121,7 +121,7 @@ pub fn test_case(attr: TokenStream, item: TokenStream) -> TokenStream {
 
     let mut result = proc_macro2::TokenStream::new();
     for test_description in test_descriptions {
-        let test_case_name = syn::Ident::new(&test_description.name, Span::call_site());
+        let test_case_name = syn::Ident::new(&test_description.name.to_lowercase(), Span::call_site());
         let literals = test_description.args;
         let attributes = test_description.attributes;
         if literals.len() != fn_args_idents.len() {
