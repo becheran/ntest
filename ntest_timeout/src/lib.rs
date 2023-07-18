@@ -83,20 +83,17 @@ fn check_other_attributes(input: &syn::ItemFn) {
         match meta {
             std::result::Result::Ok(m) => match m {
                 syn::Meta::Path(p) => {
-                    let identifier = p.get_ident().expect("Expected identifier!");
-                    if identifier == "timeout" {
+                    if p.segments.iter().any(|ps| ps.ident == "timeout") {
                         panic!("Timeout attribute is only allowed once");
                     }
                 }
                 syn::Meta::List(ml) => {
-                    let identifier = ml.path.get_ident().expect("Expected identifier!");
-                    if identifier == "timeout" {
+                    if ml.path.segments.iter().any(|ps| ps.ident == "timeout") {
                         panic!("Timeout attribute is only allowed once");
                     }
                 }
                 syn::Meta::NameValue(nv) => {
-                    let identifier = nv.path.get_ident().expect("Expected identifier!");
-                    if identifier == "timeout" {
+                    if nv.path.segments.iter().any(|ps| ps.ident == "timeout") {
                         panic!("Timeout attribute is only allowed once");
                     }
                 }
