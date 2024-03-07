@@ -22,10 +22,6 @@ path = "../ntest_test_cases"
 version = "0.9.0"
 path = "../ntest_timeout"
 
-[badges.gitlab]
-repository = "becheran/ntest_ci"
-branch = "master"
-
 [badges.maintenance]
 status = "actively-developed"
 
