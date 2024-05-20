@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Markup Link Checker (mlc)
-        uses: becheran/mlc@v0.16.3
+        uses: becheran/mlc@v0.17.0
         with:
           args: "./ -d"
 
