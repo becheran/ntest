@@ -56,8 +56,10 @@ pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
     let sig = &input.sig;
     let output = &sig.output;
     let body = &input.block;
+    let attrs = &input.attrs;
     check_other_attributes(&input);
     let result = quote! {
+        #(#attrs)*
         #vis #sig {
             fn ntest_callback() #output
             #body
