@@ -18,7 +18,7 @@ mod syn_helper;
 /// enum or constant of those types.
 ///
 /// Please note that rust functions can only contain alphanumeric characters and '_' signs.
-/// Special characters will be escaped using a meaning full replacement (for example `#` will be replaced with `_hash`),
+/// Special characters will be escaped using a meaningful replacement (for example `#` will be replaced with `_hash`),
 /// or as a default the '_' sign.
 ///
 /// A function annotated with a `#[test_case]` attribute will be split into multiple rust functions annotated with the `#[test]` attribute.
