@@ -44,3 +44,18 @@ fn timeout_with_result_2() -> Result<(), String> {
     thread::sleep(ten_millis);
     Ok(())
 }
+
+// Test for issue: ntest_timeout ruins #[should_panic = "message"]
+#[test]
+#[should_panic = "402"]
+#[timeout(8000)]
+fn should_panic_with_message() {
+    panic!("402")
+}
+
+#[test]
+#[should_panic]
+#[timeout(8000)]
+fn should_panic_without_message() {
+    panic!("some panic message")
+}
