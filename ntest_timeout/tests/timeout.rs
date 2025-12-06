@@ -73,3 +73,11 @@ fn should_panic_with_expected_syntax() {
 fn should_panic_with_message_reversed_order() {
     panic!("error 123")
 }
+
+// Exact test case from the issue
+#[test]
+#[should_panic = "402"]
+#[timeout(8000)]
+fn pass_in_the_end_from_issue() {
+    panic!("402")
+}

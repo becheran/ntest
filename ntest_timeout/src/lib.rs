@@ -66,12 +66,13 @@ pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
             let ntest_timeout_now = std::time::Instant::now();
             
             type NtestPanicPayload = std::boxed::Box<dyn std::any::Any + Send + 'static>;
+            // Channel sends Result: Ok for success, Err for panic payload
             let (sender, receiver) = std::sync::mpsc::channel::<std::result::Result<_, NtestPanicPayload>>();
             std::thread::spawn(move || {
                 let panic_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                     ntest_callback()
                 }));
-                // Always try to send the result (success or panic payload)
+                // Send will fail if receiver has already timed out or dropped - this is expected
                 let _ = sender.send(panic_result);
             });
             match receiver.recv_timeout(std::time::Duration::from_millis(#time_ms)) {
