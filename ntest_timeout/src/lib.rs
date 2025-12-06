@@ -65,14 +65,23 @@ pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
             #body
             let ntest_timeout_now = std::time::Instant::now();
             
-            let (sender, receiver) = std::sync::mpsc::channel();
+            type NtestPanicPayload = std::boxed::Box<dyn std::any::Any + Send + 'static>;
+            let (sender, receiver) = std::sync::mpsc::channel::<std::result::Result<_, NtestPanicPayload>>();
             std::thread::spawn(move || {
-                if let std::result::Result::Ok(()) = sender.send(ntest_callback()) {}
+                let panic_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                    ntest_callback()
+                }));
+                // Always try to send the result (success or panic payload)
+                let _ = sender.send(panic_result);
             });
             match receiver.recv_timeout(std::time::Duration::from_millis(#time_ms)) {
-                std::result::Result::Ok(t) => return t,
+                std::result::Result::Ok(std::result::Result::Ok(t)) => return t,
+                std::result::Result::Ok(std::result::Result::Err(panic_payload)) => {
+                    // Resume the panic with the original payload to preserve panic message
+                    std::panic::resume_unwind(panic_payload);
+                },
                 Err(std::sync::mpsc::RecvTimeoutError::Timeout) => panic!("timeout: the function call took {} ms. Max time {} ms", ntest_timeout_now.elapsed().as_millis(), #time_ms),
-                Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => panic!(),
+                Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => panic!("Thread disconnected unexpectedly"),
             }
         }
     };

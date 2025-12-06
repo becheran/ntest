@@ -59,3 +59,17 @@ fn should_panic_with_message() {
 fn should_panic_without_message() {
     panic!("some panic message")
 }
+
+#[test]
+#[should_panic(expected = "custom error")]
+#[timeout(8000)]
+fn should_panic_with_expected_syntax() {
+    panic!("custom error")
+}
+
+#[timeout(8000)]
+#[test]
+#[should_panic = "error 123"]
+fn should_panic_with_message_reversed_order() {
+    panic!("error 123")
+}
