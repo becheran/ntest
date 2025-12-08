@@ -29,5 +29,5 @@ status = "actively-developed"
 panic = "unwind"
 
 [dev-dependencies.tokio]
-version = "1.6.1"
+version = "1.48"
 features = [ "rt", "macros",]
