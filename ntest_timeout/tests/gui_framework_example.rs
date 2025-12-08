@@ -1,9 +1,8 @@
 /// This test file demonstrates that the timeout attribute now works correctly
 /// with code that requires running on the "main" thread, such as GUI frameworks.
 /// 
-/// This addresses the issue: https://github.com/becheran/ntest/issues/XX
-/// where users couldn't use #[timeout] with GUI frameworks like Dioxus because
-/// the old implementation spawned a new thread for the test.
+/// This addresses the issue where users couldn't use #[timeout] with GUI frameworks
+/// like Dioxus because the old implementation spawned a new thread for the test.
 
 use ntest_timeout::timeout;
 use std::cell::Cell;

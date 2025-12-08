@@ -1,16 +1,15 @@
 use ntest_timeout::timeout;
+use std::sync::OnceLock;
 use std::thread;
 
 /// Store the thread ID to compare between tests
-static mut TEST_THREAD_ID: Option<std::thread::ThreadId> = None;
+static TEST_THREAD_ID: OnceLock<std::thread::ThreadId> = OnceLock::new();
 
 #[test]
 fn test_01_without_timeout_capture_thread_id() {
     // Capture the thread ID of a normal test
     let thread_id = thread::current().id();
-    unsafe {
-        TEST_THREAD_ID = Some(thread_id);
-    }
+    let _ = TEST_THREAD_ID.set(thread_id);
     println!("Normal test - Thread ID: {:?}, Thread name: {:?}", thread_id, thread::current().name());
 }
 
@@ -19,7 +18,7 @@ fn test_01_without_timeout_capture_thread_id() {
 fn test_02_with_timeout_same_thread() {
     // Check if timeout now runs on the same thread (the fix)
     let thread_id = thread::current().id();
-    let original_thread_id = unsafe { TEST_THREAD_ID };
+    let original_thread_id = TEST_THREAD_ID.get();
     
     println!("Timeout test - Thread ID: {:?}, Thread name: {:?}", thread_id, thread::current().name());
     println!("Original test thread ID: {:?}", original_thread_id);

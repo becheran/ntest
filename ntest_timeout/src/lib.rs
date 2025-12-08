@@ -85,7 +85,8 @@ pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
             std::thread::spawn(move || {
                 std::thread::sleep(std::time::Duration::from_millis(#time_ms));
                 // Check if the test has completed
-                if !completed_clone.load(std::sync::atomic::Ordering::SeqCst) {
+                // Using Relaxed ordering is sufficient as we only need eventual visibility
+                if !completed_clone.load(std::sync::atomic::Ordering::Relaxed) {
                     // Test has not completed - print error message and abort
                     eprintln!("timeout: the function call took more than {} ms", #time_ms);
                     std::process::abort();
@@ -99,7 +100,8 @@ pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
             }));
             
             // Mark as completed before handling the result
-            completed.store(true, std::sync::atomic::Ordering::SeqCst);
+            // Using Relaxed ordering is sufficient for signaling completion
+            completed.store(true, std::sync::atomic::Ordering::Relaxed);
             
             // Handle the result
             match panic_result {
