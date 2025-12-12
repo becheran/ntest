@@ -13,6 +13,19 @@ use syn::parse_macro_input;
 ///
 /// The function input must be of type `int`. For example `#[timeout(10)]` will fail if the test takes longer than 10 milliseconds.
 ///
+/// ## Behavior
+///
+/// The test function runs on the calling thread (preserving thread-local state and allowing
+/// use of APIs that require running on the "main" thread, such as GUI frameworks). A separate
+/// watcher thread monitors the test execution. If the test completes (successfully or with a panic)
+/// within the timeout period, the result is returned normally. If the test exceeds the timeout,
+/// the process is aborted via `std::process::abort()`.
+///
+/// **Important**: Tests that genuinely exceed the timeout will abort the entire test process.
+/// This means tests with infinite loops or very long sleeps that exceed the timeout cannot be
+/// combined with `#[should_panic]` in the traditional sense, as the abort happens before the
+/// test harness can catch a panic. This is a trade-off to allow tests to run on the calling thread.
+///
 /// # Examples
 ///
 /// This example will not panic
@@ -26,14 +39,13 @@ use syn::parse_macro_input;
 /// }
 /// ```
 ///
-/// This example will panic and break the infinite loop after 10 milliseconds.
+/// This example will abort the process after exceeding the timeout (cannot use `#[should_panic]` with actual timeouts):
 ///
-/// ```
+/// ```no_run
 /// #[test]
 /// #[timeout(10)]
-/// #[should_panic]
-/// fn timeout() {
-///     loop {};
+/// fn timeout_example() {
+///     loop {}; // This will abort the process after 10ms
 /// }
 /// ```
 ///
@@ -65,24 +77,39 @@ pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
             #body
             let ntest_timeout_now = std::time::Instant::now();
             
-            type NtestPanicPayload = std::boxed::Box<dyn std::any::Any + Send + 'static>;
-            // Channel sends Result: Ok for success, Err for panic payload
-            let (sender, receiver) = std::sync::mpsc::channel::<std::result::Result<_, NtestPanicPayload>>();
+            // Use an atomic flag to signal completion to the watcher thread
+            let completed = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+            let completed_clone = completed.clone();
+            
+            // Spawn a watcher thread that will abort the process if timeout is exceeded
             std::thread::spawn(move || {
-                let panic_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                    ntest_callback()
-                }));
-                // Send will fail if receiver has already timed out or dropped - this is expected
-                let _ = sender.send(panic_result);
+                std::thread::sleep(std::time::Duration::from_millis(#time_ms));
+                // Check if the test has completed
+                // Using Relaxed ordering is sufficient as we only need eventual visibility
+                if !completed_clone.load(std::sync::atomic::Ordering::Relaxed) {
+                    // Test has not completed - print error message and abort
+                    eprintln!("timeout: the function call took more than {} ms", #time_ms);
+                    std::process::abort();
+                }
             });
-            match receiver.recv_timeout(std::time::Duration::from_millis(#time_ms)) {
-                std::result::Result::Ok(std::result::Result::Ok(t)) => return t,
-                std::result::Result::Ok(std::result::Result::Err(panic_payload)) => {
+            
+            // Run the test on the current thread (not in a spawned thread)
+            // This allows tests that require the main thread to work correctly
+            let panic_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                ntest_callback()
+            }));
+            
+            // Mark as completed before handling the result
+            // Using Relaxed ordering is sufficient for signaling completion
+            completed.store(true, std::sync::atomic::Ordering::Relaxed);
+            
+            // Handle the result
+            match panic_result {
+                std::result::Result::Ok(t) => return t,
+                std::result::Result::Err(panic_payload) => {
                     // Resume the panic with the original payload to preserve panic message
                     std::panic::resume_unwind(panic_payload);
-                },
-                Err(std::sync::mpsc::RecvTimeoutError::Timeout) => panic!("timeout: the function call took {} ms. Max time {} ms", ntest_timeout_now.elapsed().as_millis(), #time_ms),
-                Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => panic!("Thread disconnected unexpectedly"),
+                }
             }
         }
     };
