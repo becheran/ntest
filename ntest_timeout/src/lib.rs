@@ -65,7 +65,7 @@ pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
             #body
             let ntest_timeout_now = std::time::Instant::now();
             
-            type NtestPanicPayload = std::boxed::Box<dyn std::any::Any + Send + 'static>;
+            type NtestPanicPayload = std::boxed::Box<dyn std::any::Any + std::marker::Send + 'static>;
             // Channel sends Result: Ok for success, Err for panic payload
             let (sender, receiver) = std::sync::mpsc::channel::<std::result::Result<_, NtestPanicPayload>>();
             std::thread::spawn(move || {
