@@ -11,7 +11,8 @@ use syn::parse_macro_input;
 /// The timeout attribute can be used for tests to let them fail if they exceed a certain execution time.
 /// With the `#[timeout]` attribute a timeout in milliseconds is added to a test.
 ///
-/// The function input must be of type `int`. For example `#[timeout(10)]` will fail if the test takes longer than 10 milliseconds.
+/// The first function input must be of type `int`. For example `#[timeout(10)]` will fail if the test takes longer than 10 milliseconds.
+/// Add `abort` as a second argument to abort the process instead of panicking when the timeout is reached.
 ///
 /// # Examples
 ///
@@ -37,6 +38,16 @@ use syn::parse_macro_input;
 /// }
 /// ```
 ///
+/// To abort the process when a timeout is reached, use `abort`:
+///
+/// ```ignore
+/// #[test]
+/// #[timeout(10, abort)]
+/// fn timeout_and_abort() {
+///     loop {};
+/// }
+/// ```
+///
 /// Also works with test functions using a Result:
 ///
 /// ```
@@ -51,7 +62,7 @@ use syn::parse_macro_input;
 #[proc_macro_attribute]
 pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::ItemFn);
-    let time_ms = get_timeout(&parse_macro_input!(attr as syn::AttributeArgs));
+    let (time_ms, abort) = get_timeout(&parse_macro_input!(attr as syn::AttributeArgs));
     let vis = &input.vis;
     let sig = &input.sig;
     let output = &sig.output;
@@ -64,7 +75,7 @@ pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
             fn ntest_callback() #output
             #body
             let ntest_timeout_now = std::time::Instant::now();
-            
+
             type NtestPanicPayload = std::boxed::Box<dyn std::any::Any + std::marker::Send + 'static>;
             // Channel sends Result: Ok for success, Err for panic payload
             let (sender, receiver) = std::sync::mpsc::channel::<std::result::Result<_, NtestPanicPayload>>();
@@ -81,7 +92,14 @@ pub fn timeout(attr: TokenStream, item: TokenStream) -> TokenStream {
                     // Resume the panic with the original payload to preserve panic message
                     std::panic::resume_unwind(panic_payload);
                 },
-                Err(std::sync::mpsc::RecvTimeoutError::Timeout) => panic!("timeout: the function call took {} ms. Max time {} ms", ntest_timeout_now.elapsed().as_millis(), #time_ms),
+                Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {
+                    if #abort {
+                        eprintln!("timeout: the function call took {} ms. Max time {} ms", ntest_timeout_now.elapsed().as_millis(), #time_ms);
+                        std::process::abort();
+                    } else {
+                        panic!("timeout: the function call took {} ms. Max time {} ms", ntest_timeout_now.elapsed().as_millis(), #time_ms);
+                    }
+                },
                 Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => panic!("Thread disconnected unexpectedly"),
             }
         }
@@ -115,11 +133,11 @@ fn check_other_attributes(input: &syn::ItemFn) {
     }
 }
 
-fn get_timeout(attribute_args: &syn::AttributeArgs) -> u64 {
-    if attribute_args.len() > 1 {
-        panic!("Only one integer expected. Example: #[timeout(10)]");
+fn get_timeout(attribute_args: &syn::AttributeArgs) -> (u64, bool) {
+    if attribute_args.is_empty() || attribute_args.len() > 2 {
+        panic!("Expected a timeout in milliseconds, optionally followed by abort. Example: #[timeout(10, abort)]");
     }
-    match &attribute_args[0] {
+    let time_ms = match &attribute_args[0] {
         syn::NestedMeta::Meta(_) => {
             panic!("Integer expected. Example: #[timeout(10)]");
         }
@@ -129,5 +147,16 @@ fn get_timeout(attribute_args: &syn::AttributeArgs) -> u64 {
                 panic!("Integer as timeout in ms expected. Example: #[timeout(10)]");
             }
         },
-    }
+    };
+    let abort = if attribute_args.len() == 2 {
+        match &attribute_args[1] {
+            syn::NestedMeta::Meta(syn::Meta::Path(path)) if path.is_ident("abort") => true,
+            _ => panic!(
+                "Only 'abort' is allowed as the second argument. Example: #[timeout(10, abort)]"
+            ),
+        }
+    } else {
+        false
+    };
+    (time_ms, abort)
 }
