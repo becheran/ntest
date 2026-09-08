@@ -64,6 +64,18 @@ fn timeout() {
 }
 ```
 
+For tests that must not continue running in the background after a timeout,
+use the opt-in `abort` mode. It prints the timeout message and aborts the
+process:
+
+```rust
+#[test]
+#[timeout(2000, abort)]
+fn timeout_and_abort() {
+    loop {};
+}
+```
+
 ### Combine attributes
 
 ```rust
