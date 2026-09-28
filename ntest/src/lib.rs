@@ -203,7 +203,6 @@ macro_rules! assert_panics {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     #[test]
     fn assert_true() {
         assert_true!(true);
